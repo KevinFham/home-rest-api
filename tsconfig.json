@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "module": "es2022",
-    "target": "es6",
+    "module": "nodenext",
+    "target": "esnext",
     "lib": [
         "es2022"
     ],
     //"types": [    //Include only these types
     //    "node", "express"
     //],
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,                    // Babel
@@ -35,8 +37,8 @@
     "skipLibCheck": true,
 
     // Custom Options
-    "resolveJsonModule": true,
     "baseUrl": "./",
+    "outDir": "./build",
     "paths": {
         "@/src/*": [
             "src/*"
@@ -48,6 +50,8 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "**/node_modules"
+    "**/node_modules",
+    "build",
+    "types"
   ]
 }

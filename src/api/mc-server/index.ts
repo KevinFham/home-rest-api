@@ -1,22 +1,25 @@
 import 'dotenv/config';
-import { promiseExec, parseConfig } from '../../utils.ts';
+import type { Request, Response } from 'express';
+import { promiseExec, parseConfig } from '@/src/utils.js';
 
 const cfg = parseConfig();
 
-async function isMachineUp(serverAddress, timeoutms = 600): boolean {
-    const { stdout } = await promiseExec(`fping -c1 -t${timeoutms} ${serverAddress}`);
-    if (stdout.includes("timed out")) { return false; } 
-    else { return true; }
+async function isMachineUp(serverAddress: string, timeoutms: number = 600): Promise<boolean> {
+    return new Promise( async function(resolve, _) {
+        const { stdout } = await promiseExec(`fping -c1 -t${timeoutms} ${serverAddress}`);
+        if (stdout.includes("timed out")) { resolve(false); } 
+        else { resolve(true); }
+    });
 }
 
-const ServerStatus = {
-    STOPPED: "STOPPED",
-    STARTING: "STARTING",
-    ACTIVE: "ACTIVE",
-    UNKNOWN: "UNKNOWN",
-    ERROR: "ERROR",
+enum ServerStatus {
+    STOPPED = "STOPPED",
+    STARTING = "STARTING",
+    ACTIVE = "ACTIVE",
+    UNKNOWN = "UNKNOWN",
+    ERROR = "ERROR",
 };
-async function getMinecraftServerStatus(serverAddress, mcServerContainerName): ServerStatus {
+async function getMinecraftServerStatus(serverAddress: string, mcServerContainerName: string): Promise<ServerStatus> {
     const { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker container inspect -f '{{.State.Status}}, {{.State.Health}} exitcode{{.State.ExitCode}}' ${mcServerContainerName}"`);
     if ( stdout.includes("running") && stdout.includes("healthy") ) {
         return ServerStatus.ACTIVE;
@@ -31,15 +34,22 @@ async function getMinecraftServerStatus(serverAddress, mcServerContainerName): S
     }
 }
 
-async function getMinecraftServerPlayers(serverAddress, mcServerContainerName): string[] {
-    var { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker exec ${mcServerContainerName} rcon-cli \"list\" | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/^[0-9a-zA-Z ]*: '//g -e 's/ //g'"`);
-    return stdout.trim().split(",").filter(x => x);
+async function getMinecraftServerPlayers(serverAddress: string, mcServerContainerName: string): Promise<string[]> {
+    return new Promise( async function(resolve, reject) {
+        try {
+            var { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker exec ${mcServerContainerName} rcon-cli \"list\" | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/^[0-9a-zA-Z ]*: '//g -e 's/ //g'"`);
+            resolve(stdout.trim().split(",").filter((x: string) => x));
+        } catch (err) {
+            console.log(err);
+            reject(err);
+        }
+    });
 }
 
-const actionHandler = async ( server, req, res ) => {
+const actionHandler = async ( req: Request, res: Response ) => {
     const payload = req.body;
     if( payload === undefined ) { res.status(400).send('Bad Request'); }
-    else if ( ! 'action' in payload ) { res.status(400).send('Bad Request'); }
+    else if ( !( 'action' in payload ) ) { res.status(400).send('Bad Request'); }
 
     // TODO: Check for missing machine_address field in payload in future. For now, single machine will do fine.
 
@@ -104,7 +114,7 @@ const actionHandler = async ( server, req, res ) => {
             const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
             if ( mcStatus === ServerStatus.ACTIVE ) {
                 const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
-                if ( !currentlyOnline.length > 0 ) {
+                if ( !( currentlyOnline.length > 0 ) ) {
                     await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker exec ${cfg.mcServer.mcServerContainerName} rcon-cli \"stop\""`);
                     res.status(200).send({ code: 0, message: "Shutting down Minecraft Server" });
                 } else {

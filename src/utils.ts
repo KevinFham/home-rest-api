@@ -1,12 +1,12 @@
+import type { ExecException } from 'child_process';
 import { exec } from 'child_process';
 import { readFileSync, existsSync } from 'fs';
 import YAML from 'yaml';
 
-const promiseExec = async (command) => {
-    return new Promise(( resolve, reject ) => {
+const promiseExec = async (command: string): Promise<{stdout: string, stderr: string, err: ExecException | null}> => {
+    return new Promise(( resolve, _ ) => {
         exec(command, (err, stdout, stderr) => {
-            resolve({ stdout, stderr });
-            return;
+            resolve({ stdout, stderr, err });
         });
     });
 }
