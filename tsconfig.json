@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "module": "es2022",
+    "target": "es6",
+    "lib": [
+        "es2022"
+    ],
+    //"types": [    //Include only these types
+    //    "node", "express"
+    //],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,                    // Babel
+    "declarationDir": "./types",
+    "declarationMap": true,
+    "emitDeclarationOnly": true,            // Babel
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options
+    "jsx": "react-jsx",  // MIGHT NEED TO CHANGE FOR SPECIFIC REACT APPLICATIONS
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,                // Babel
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+
+    // Custom Options
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+        "@/src/*": [
+            "src/*"
+        ],
+    },
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "**/node_modules"
+  ]
+}

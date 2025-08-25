@@ -1,0 +1,26 @@
+{
+    "name": "Home REST API Server",
+    "version": "1.0.0",
+    "description": "Central API server for controlling stuff at home",
+    "type": "module",
+    "engines": {
+        "node": ">=18.x"
+    },
+    "main": "src/main.ts",
+    "scripts": {
+        "dev": "npx tsx .",
+        "deploy": "pm2 kill && pm2 start main.js && echo \"\nTo run the bot on machine startup, run: pm2 startup && pm2 save\n\""
+    },
+    "dependencies": {
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.3.0",
+        "child_process": "^1.0.2",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "yaml": "^2.8.1"
+    },
+    "devDependencies": {
+        "tsx": "^4.20.5",
+        "typescript": "^5.9.2"
+    }
+}

@@ -1,0 +1,119 @@
+import 'dotenv/config';
+import { promiseExec, parseConfig } from '../../utils.ts';
+
+const cfg = parseConfig();
+
+async function isMachineUp(serverAddress, timeoutms = 600): boolean {
+    const { stdout } = await promiseExec(`fping -c1 -t${timeoutms} ${serverAddress}`);
+    if (stdout.includes("timed out")) { return false; } 
+    else { return true; }
+}
+
+const ServerStatus = {
+    STOPPED: "STOPPED",
+    STARTING: "STARTING",
+    ACTIVE: "ACTIVE",
+    UNKNOWN: "UNKNOWN",
+    ERROR: "ERROR",
+};
+async function getMinecraftServerStatus(serverAddress, mcServerContainerName): ServerStatus {
+    const { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker container inspect -f '{{.State.Status}}, {{.State.Health}} exitcode{{.State.ExitCode}}' ${mcServerContainerName}"`);
+    if ( stdout.includes("running") && stdout.includes("healthy") ) {
+        return ServerStatus.ACTIVE;
+    } else if ( stdout.includes("starting") ) {
+        return ServerStatus.STARTING;
+    } else if ( stdout.includes("exitcode137") && !stdout.includes("exitcode0")) {
+        return ServerStatus.ERROR;
+    } else if ( stdout.includes("exited") ) {
+        return ServerStatus.STOPPED;
+    } else {
+        return ServerStatus.UNKNOWN;
+    }
+}
+
+const actionHandler = async ( server, req, res ) => {
+    const payload = req.body;
+    if( payload === undefined ) { res.status(400).send('Bad Request'); }
+    else if ( ! 'action' in payload ) { res.status(400).send('Bad Request'); }
+
+    else if ( payload.action === 'startMachine' ) {                                 // Start Machine
+        await promiseExec(`wakeonlan ${cfg.mcServer.serverMacAddr}`);
+        res.status(200).send({ code: 0, message: "Starting Machine" });
+    }
+
+    else if ( payload.action === 'getMachineStatus' ) {                             // Get Machine Status
+        const isUp = await isMachineUp(cfg.mcServer.serverHostName);
+        if ( isUp ) {
+            res.status(200).send({ code: 0, message: "Machine is up" });
+        } else {
+            res.status(200).send({ code: 1, message: "Machine is down" });
+        }
+    }
+
+    else if ( payload.action === 'startMinecraftServer' ) {                         // Start Minecraft Server
+        const isUp = await isMachineUp(cfg.mcServer.serverHostName);
+        if ( isUp ) {
+            const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
+            if ( mcStatus === ServerStatus.ACTIVE ) {
+                res.status(200).send({ code: 1, message: "Minecraft server is already up and running" });
+            } else if ( mcStatus === ServerStatus.STARTING ) {
+                res.status(200).send({ code: 1, message: "Minecraft server is already starting" });
+            } else if ( mcStatus === ServerStatus.STOPPED || mcStatus === ServerStatus.ERROR ) {
+                await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker start ${cfg.mcServer.mcServerContainerName}"`); 
+                res.status(200).send({ code: 0, message: "Starting Minecraft Server" });
+            } else {
+                res.status(200).send({ code: 1, message: "Minecraft server status unknown" })
+            }
+
+        } else {
+            res.status(200).send({ code: 1, message: "Server is down because machine is down" });
+        }
+    }
+
+    else if ( payload.action === 'getMinecraftServerStatus' ) {                     // Get Minecraft Server Status
+        var isUp = await isMachineUp(cfg.mcServer.serverHostName);
+        if ( isUp ) {
+            const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
+            if ( mcStatus === ServerStatus.ACTIVE ) {
+                res.status(200).send({ code: 0, server: "running", message: "Minecraft server is up and running" });
+            } else if ( mcStatus === ServerStatus.STARTING ) {
+                res.status(200).send({ code: 0, server: "starting", message: "Minecraft server is starting" });
+            } else if ( mcStatus === ServerStatus.ERROR ) {
+                res.status(200).send({ code: 1, server: "error", message: "Minecraft server has an error" });
+            } else if ( mcStatus === ServerStatus.STOPPED ) {
+                res.status(200).send({ code: 0, server: "exited", message: "Minecraft server is shut down" });
+            } else {
+                res.status(200).send({ code: 1, server: "unknown", message: "Minecraft server status unknown" })
+            }
+        } else {
+            res.status(200).send({ code: 1, server: "down",  message: "Server is down because machine is down" });
+        }
+    }
+
+    else if ( payload.action === 'stopMinecraftServer' ) {                          // Stop Minecraft Server
+        const isUp = await isMachineUp(cfg.mcServer.serverHostName);
+        if ( isUp ) {
+            const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
+            if ( mcStatus === ServerStatus.ACTIVE ) {
+                await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker exec ${cfg.mcServer.mcServerContainerName} rcon-cli \"stop\""`);
+                //STOP ONLY ON NO PLAYERS FOUND
+                res.status(200).send({ code: 0, message: "Shutting down Minecraft Server" });
+            } else if ( mcStatus === ServerStatus.STARTING ) {
+                res.status(200).send({ code: 1, message: "Minecraft server is starting. Aborting shutdown." });
+            } else if ( mcStatus === ServerStatus.STOPPED || mcStatus === ServerStatus.ERROR ) {
+                res.status(200).send({ code: 1, message: "Minecraft server is already stopped" });
+            } else {
+                res.status(200).send({ code: 1, server: "unknown", message: "Minecraft server status unknown" })
+            }
+        } else {
+            res.status(200).send({ code: 1, message: "Server is already down because machine is down" });
+        }
+    }
+
+    else {                                                                          // Unknown Action
+        res.status(400).send(`Unknown Action "${payload.action}"`);
+    }
+
+}
+
+export { actionHandler };
