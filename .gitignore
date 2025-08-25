@@ -1,6 +1,10 @@
 # Config file
 config.yml
 
+# Build artifacts
+build/
+types/
+
 # Logs
 logs
 *.log
