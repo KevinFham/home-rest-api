@@ -31,10 +31,17 @@ async function getMinecraftServerStatus(serverAddress, mcServerContainerName): S
     }
 }
 
+async function getMinecraftServerPlayers(serverAddress, mcServerContainerName): string[] {
+    var { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker exec ${mcServerContainerName} rcon-cli \"list\" | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/^[0-9a-zA-Z ]*: '//g -e 's/ //g'"`);
+    return stdout.trim().split(",").filter(x => x);
+}
+
 const actionHandler = async ( server, req, res ) => {
     const payload = req.body;
     if( payload === undefined ) { res.status(400).send('Bad Request'); }
     else if ( ! 'action' in payload ) { res.status(400).send('Bad Request'); }
+
+    // TODO: Check for missing machine_address field in payload in future. For now, single machine will do fine.
 
     else if ( payload.action === 'startMachine' ) {                                 // Start Machine
         await promiseExec(`wakeonlan ${cfg.mcServer.serverMacAddr}`);
@@ -62,7 +69,7 @@ const actionHandler = async ( server, req, res ) => {
                 await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker start ${cfg.mcServer.mcServerContainerName}"`); 
                 res.status(200).send({ code: 0, message: "Starting Minecraft Server" });
             } else {
-                res.status(200).send({ code: 1, message: "Minecraft server status unknown" })
+                res.status(200).send({ code: 1, message: "Minecraft server status unknown" });
             }
 
         } else {
@@ -75,18 +82,19 @@ const actionHandler = async ( server, req, res ) => {
         if ( isUp ) {
             const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
             if ( mcStatus === ServerStatus.ACTIVE ) {
-                res.status(200).send({ code: 0, server: "running", message: "Minecraft server is up and running" });
+                const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
+                res.status(200).send({ code: 0, server: "running", players: currentlyOnline, message: "Minecraft server is up and running" });
             } else if ( mcStatus === ServerStatus.STARTING ) {
-                res.status(200).send({ code: 0, server: "starting", message: "Minecraft server is starting" });
+                res.status(200).send({ code: 0, server: "starting", players: [], message: "Minecraft server is starting" });
             } else if ( mcStatus === ServerStatus.ERROR ) {
-                res.status(200).send({ code: 1, server: "error", message: "Minecraft server has an error" });
+                res.status(200).send({ code: 1, server: "error", players: [], message: "Minecraft server has an error" });
             } else if ( mcStatus === ServerStatus.STOPPED ) {
-                res.status(200).send({ code: 0, server: "exited", message: "Minecraft server is shut down" });
+                res.status(200).send({ code: 0, server: "exited", players: [], message: "Minecraft server is shut down" });
             } else {
-                res.status(200).send({ code: 1, server: "unknown", message: "Minecraft server status unknown" })
+                res.status(200).send({ code: 1, server: "unknown", players: [], message: "Minecraft server status unknown" });
             }
         } else {
-            res.status(200).send({ code: 1, server: "down",  message: "Server is down because machine is down" });
+            res.status(200).send({ code: 1, server: "down", players: [], message: "Server is down because machine is down" });
         }
     }
 
@@ -95,15 +103,20 @@ const actionHandler = async ( server, req, res ) => {
         if ( isUp ) {
             const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
             if ( mcStatus === ServerStatus.ACTIVE ) {
-                await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker exec ${cfg.mcServer.mcServerContainerName} rcon-cli \"stop\""`);
-                //STOP ONLY ON NO PLAYERS FOUND
-                res.status(200).send({ code: 0, message: "Shutting down Minecraft Server" });
+                const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
+                if ( !currentlyOnline.length > 0 ) {
+                    await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker exec ${cfg.mcServer.mcServerContainerName} rcon-cli \"stop\""`);
+                    res.status(200).send({ code: 0, message: "Shutting down Minecraft Server" });
+                } else {
+                    res.status(200).send({ code: 1, message: `${currentlyOnline.length} players online. Aborting shutdown.` });
+                }
+
             } else if ( mcStatus === ServerStatus.STARTING ) {
                 res.status(200).send({ code: 1, message: "Minecraft server is starting. Aborting shutdown." });
             } else if ( mcStatus === ServerStatus.STOPPED || mcStatus === ServerStatus.ERROR ) {
                 res.status(200).send({ code: 1, message: "Minecraft server is already stopped" });
             } else {
-                res.status(200).send({ code: 1, server: "unknown", message: "Minecraft server status unknown" })
+                res.status(200).send({ code: 1, message: "Minecraft server status unknown" });
             }
         } else {
             res.status(200).send({ code: 1, message: "Server is already down because machine is down" });
