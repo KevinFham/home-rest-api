@@ -11,11 +11,11 @@
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "sourceMap": true,
-    "declaration": true,                    // Babel
-    "declarationDir": "./types",
-    "declarationMap": true,
-    "emitDeclarationOnly": true,            // Babel
+    "plugins": [
+        { "transform": "@zerollup/ts-transform-paths" },
+        { "transform": "typescript-transform-paths" },
+        //{ "transform": "typescript-transform-paths", "afterDeclarations": true },     // If declaration: true
+    ],
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
@@ -31,14 +31,23 @@
     // Recommended Options
     "jsx": "react-jsx",  // MIGHT NEED TO CHANGE FOR SPECIFIC REACT APPLICATIONS
     "verbatimModuleSyntax": true,
-    "isolatedModules": true,                // Babel
+    "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
 
-    // Custom Options
-    "baseUrl": "./",
+    // Build Options
     "outDir": "./build",
+    "inlineSources": true,
+    //"inlineSourceMap": true,
+    "sourceMap": true,
+    //"declaration": true,
+    //"declarationDir": "./types",
+    //"declarationMap": true,
+    //"emitDeclarationOnly": true,
+
+    // Pathing
+    "baseUrl": "./",
     "paths": {
         "@/src/*": [
             "src/*"
@@ -51,7 +60,6 @@
   ],
   "exclude": [
     "**/node_modules",
-    "build",
-    "types"
+    "types",
   ]
 }

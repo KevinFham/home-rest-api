@@ -3,7 +3,6 @@ config.yml
 
 # Build artifacts
 build/
-types/
 
 # Logs
 logs

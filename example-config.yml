@@ -1,0 +1,6 @@
+# Minecraft Server Config
+mcServer:
+  serverMacAddr: ''
+  serverHostName: ''
+  mcServerAddr: ''
+  mcServerContainerName: ''
