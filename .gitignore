@@ -4,6 +4,10 @@ config.yml
 # Build artifacts
 build/
 
+# Etc
+nginx-config/*
+!nginx-config/example-api-server.conf
+
 # Logs
 logs
 *.log
