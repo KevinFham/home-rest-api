@@ -93,18 +93,18 @@ const actionHandler = async ( req: Request, res: Response ) => {
             const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
             if ( mcStatus === ServerStatus.ACTIVE ) {
                 const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
-                res.status(200).send({ code: 0, server: "running", players: currentlyOnline, message: "Minecraft server is up and running" });
+                res.status(200).send({ code: 0, serverStat: "running", players: currentlyOnline, message: "Minecraft server is up and running" });
             } else if ( mcStatus === ServerStatus.STARTING ) {
-                res.status(200).send({ code: 0, server: "starting", players: [], message: "Minecraft server is starting" });
-            } else if ( mcStatus === ServerStatus.ERROR ) {
-                res.status(200).send({ code: 1, server: "error", players: [], message: "Minecraft server has an error" });
+                res.status(200).send({ code: 0, serverStat: "starting", players: [], message: "Minecraft server is starting" });
+            } else if ( mcStatus === ServerStatus.ERROR ){
+                res.status(200).send({ code: 1, serverStat: "error", players: [], message: "Minecraft server has an error" });
             } else if ( mcStatus === ServerStatus.STOPPED ) {
-                res.status(200).send({ code: 0, server: "exited", players: [], message: "Minecraft server is shut down" });
+                res.status(200).send({ code: 0, serverStat: "exited", players: [], message: "Minecraft server is shut down" });
             } else {
-                res.status(200).send({ code: 1, server: "unknown", players: [], message: "Minecraft server status unknown" });
+                res.status(200).send({ code: 1, serverStat: "unknown", players: [], message: "Minecraft server status unknown" });
             }
         } else {
-            res.status(200).send({ code: 1, server: "down", players: [], message: "Server is down because machine is down" });
+            res.status(200).send({ code: 1, serverStat: "down", players: [], message: "Server is down because machine is down" });
         }
     }
 
@@ -116,17 +116,17 @@ const actionHandler = async ( req: Request, res: Response ) => {
                 const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, cfg.mcServer.mcServerContainerName);
                 if ( !( currentlyOnline.length > 0 ) ) {
                     await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker exec ${cfg.mcServer.mcServerContainerName} rcon-cli \"stop\""`);
-                    res.status(200).send({ code: 0, message: "Shutting down Minecraft Server" });
+                    res.status(200).send({ code: 0, message: "Shutting down Minecraft Server..." });
                 } else {
-                    res.status(200).send({ code: 1, message: `${currentlyOnline.length} players online. Aborting shutdown.` });
+                    res.status(200).send({ code: 1, message: `${currentlyOnline.length} players online! Aborting shutdown.` });
                 }
 
             } else if ( mcStatus === ServerStatus.STARTING ) {
-                res.status(200).send({ code: 1, message: "Minecraft server is starting. Aborting shutdown." });
+                res.status(200).send({ code: 1, message: "Minecraft server is starting up. Please wait until server is fully up and running." });
             } else if ( mcStatus === ServerStatus.STOPPED || mcStatus === ServerStatus.ERROR ) {
-                res.status(200).send({ code: 1, message: "Minecraft server is already stopped" });
+                res.status(200).send({ code: 1, message: "Minecraft server is already stopped!" });
             } else {
-                res.status(200).send({ code: 1, message: "Minecraft server status unknown" });
+                res.status(200).send({ code: 1, message: "Minecraft server status unknown." });
             }
         } else {
             res.status(200).send({ code: 1, message: "Server is already down because machine is down" });
