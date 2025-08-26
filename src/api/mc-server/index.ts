@@ -6,8 +6,8 @@ const cfg = parseConfig();
 
 async function isMachineUp(serverAddress: string, timeoutms: number = 600): Promise<boolean> {
     return new Promise( async function(resolve, _) {
-        const { stdout } = await promiseExec(`fping -c1 -t${timeoutms} ${serverAddress}`);
-        if (stdout.includes("timed out")) { resolve(false); } 
+        const { err } = await promiseExec(`fping -c1 -t${timeoutms} ${serverAddress}`);
+        if (err) { resolve(false); } 
         else { resolve(true); }
     });
 }
