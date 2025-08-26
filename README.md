@@ -22,13 +22,27 @@ cd home-rest-api
 pnpm install
 ```
 
+Set up nginx proxy to route `http://<HOST_NAME>/api` traffic to port `<PORT>`
+
+```bash
+# Startup nginx if it isn't already
+sudo systemctl enable nginx.service
+sudo systemctl start nginx.service
+
+# Edit api-server.conf, change $HOST_NAME to the machine's hostname and $PORT to the port that this server will listen to
+cp nginx-config/example-api-server.conf nginx-config/api-server.conf
+
+# Link to nginx
+sudo ln -s <ABSOLUTE_PATH_TO_API_SERVER_CONF> /etc/nginx/sites-available/
+sudo ln -s <ABSOLUTE_PATH_TO_API_SERVER_CONF> /etc/nginx/sites-enabled/
+sudo nginx -s reload 
+```
+
 Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` to `config.yml` and set all values.
 
 ### Configuration
 
-`mcServer`
-
-Values assume the server runs a [`docker-minecraft-server`](https://github.com/itzg/docker-minecraft-server) container.
+`mcServer` - Values assume the server runs a [`docker-minecraft-server`](https://github.com/itzg/docker-minecraft-server) container.
 
 ### Deploy
 
