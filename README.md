@@ -12,10 +12,10 @@ TODO: Figure out K3s + Prometheus for monitoring and React DOM (no Nextjs) for w
 
 Node package versions in `package.json`
 
-Install `fping`
+Install binaries
 
 ```bash
-sudo apt install fping
+sudo apt install fping wakeonlan
 ```
 
 ## Deployment
