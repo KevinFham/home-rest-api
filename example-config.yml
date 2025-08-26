@@ -1,6 +1,6 @@
 # Minecraft Server Config
 mcServer:
-  serverMacAddr: ''
-  serverHostName: ''
-  mcServerAddr: ''
-  mcServerContainerName: ''
+  serverMacAddr: '00:00:00:00'
+  serverHostName: 'localhost'
+  mcServerAddr: 'play.addr.mc'
+  mcServerContainerName: 'mc-container-1'
