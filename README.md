@@ -12,6 +12,12 @@ TODO: Figure out K3s + Prometheus for monitoring and React DOM (no Nextjs) for w
 
 Node package versions in `package.json`
 
+Install `fping`
+
+```bash
+sudo apt install fping
+```
+
 ## Deployment
 
 Clone the repo:
