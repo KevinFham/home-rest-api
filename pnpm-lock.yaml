@@ -8,15 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@types/express':
-        specifier: ^5.0.3
-        version: 5.0.3
-      '@types/node':
-        specifier: ^24.3.0
-        version: 24.3.0
-      '@zerollup/ts-transform-paths':
-        specifier: ^1.7.18
-        version: 1.7.18(typescript@5.9.2)
       child_process:
         specifier: ^1.0.2
         version: 1.0.2
@@ -26,22 +17,28 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.1.0
-      ts-patch:
-        specifier: ^3.3.0
-        version: 3.3.0
-      typescript-transform-paths:
-        specifier: ^3.5.5
-        version: 3.5.5(typescript@5.9.2)
       yaml:
         specifier: ^2.8.1
         version: 2.8.1
     devDependencies:
+      '@types/express':
+        specifier: ^5.0.3
+        version: 5.0.3
+      '@types/node':
+        specifier: ^24.3.0
+        version: 24.3.0
+      ts-patch:
+        specifier: ^3.3.0
+        version: 3.3.0
       tsx:
         specifier: ^4.20.5
         version: 4.20.5
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
+      typescript-transform-paths:
+        specifier: ^3.5.5
+        version: 3.5.5(typescript@5.9.2)
 
 packages:
 
@@ -233,16 +230,6 @@ packages:
 
   '@types/serve-static@1.15.8':
     resolution: {integrity: sha512-roei0UY3LhpOJvjbIP6ZZFngyLKl5dskOtDhxY5THRSpO+ZI+nzJ+m5yUMzGrp89YRa7lvknKkMYjqQFGwA7Sg==}
-
-  '@zerollup/ts-helpers@1.7.18':
-    resolution: {integrity: sha512-S9zN+y+i5yN/evfWquzSO3lubqPXIsPQf6p9OiPMpRxDx/0totPLF39XoRw48Dav5dSvbIE8D2eAPpXXJxvKwg==}
-    peerDependencies:
-      typescript: '>=3.7.2'
-
-  '@zerollup/ts-transform-paths@1.7.18':
-    resolution: {integrity: sha512-YPVUxvWQVzRx1OBN0Pmkd58+R9FcfUJuwTaPUSoi5rKxuXMtxevTXdfi0w5mEaIH8b0DfL+wg0wFDHiJE+S2zA==}
-    peerDependencies:
-      typescript: '>=3.7.2'
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -766,16 +753,6 @@ snapshots:
       '@types/http-errors': 2.0.5
       '@types/node': 24.3.0
       '@types/send': 0.17.5
-
-  '@zerollup/ts-helpers@1.7.18(typescript@5.9.2)':
-    dependencies:
-      resolve: 1.22.10
-      typescript: 5.9.2
-
-  '@zerollup/ts-transform-paths@1.7.18(typescript@5.9.2)':
-    dependencies:
-      '@zerollup/ts-helpers': 1.7.18(typescript@5.9.2)
-      typescript: 5.9.2
 
   accepts@2.0.0:
     dependencies:

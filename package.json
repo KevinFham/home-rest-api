@@ -15,18 +15,17 @@
         "deploy": "NODE_ENV=production pm2 start build/main.js -i 2"
     },
     "dependencies": {
-        "@types/express": "^5.0.3",
-        "@types/node": "^24.3.0",
-        "@zerollup/ts-transform-paths": "^1.7.18",
         "child_process": "^1.0.2",
         "dotenv": "^17.2.1",
         "express": "^5.1.0",
-        "ts-patch": "^3.3.0",
-        "typescript-transform-paths": "^3.5.5",
         "yaml": "^2.8.1"
     },
     "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.3.0",
+        "ts-patch": "^3.3.0",
         "tsx": "^4.20.5",
-        "typescript": "^5.9.2"
+        "typescript": "^5.9.2",
+        "typescript-transform-paths": "^3.5.5"
     }
 }

@@ -12,7 +12,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "plugins": [
-        { "transform": "@zerollup/ts-transform-paths" },
         { "transform": "typescript-transform-paths" },
         //{ "transform": "typescript-transform-paths", "afterDeclarations": true },     // If declaration: true
     ],
