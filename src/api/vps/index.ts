@@ -23,7 +23,8 @@ class VPSTimer {
     public async enableVpsTimer(): Promise<void> {
         this.vpsUpTimer = 0;
         setTimeout(() => {}, cfg.vps.startDelay * 1000);
-        
+
+        if (this.intervalID) { clearInterval(this.intervalID); }
         this.intervalID = setInterval(async () => {
             const release = await this.vpsUpTimerMutex.acquire();
             try {

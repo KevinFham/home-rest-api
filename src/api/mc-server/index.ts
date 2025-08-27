@@ -70,7 +70,7 @@ const actionHandler = async ( req: Request, res: Response ) => {
                 res.status(200).send({ code: 1, message: "Minecraft server is already starting!" });
             } else if ( mcStatus === ServerStatus.STOPPED || mcStatus === ServerStatus.ERROR ) {
                 await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker start ${cfg.mcServer.mcServerContainerName}"`); 
-                res.status(200).send({ code: 0, message: "Starting Minecraft Server." });
+                res.status(200).send({ code: 0, message: "Starting Minecraft Server!" });
             } else {
                 res.status(200).send({ code: 1, message: "Minecraft server status unknown." });
             }
