@@ -4,3 +4,11 @@ mcServer:
   serverHostName: 'localhost'
   mcServerAddr: 'play.addr.mc'
   mcServerContainerName: 'mc-container-1'
+
+# VPS Config
+vps:
+    vpsHostname: 'hostnameOrIpAddress.local'
+    dropletID: 123456789
+    # In Seconds
+    startDelay: 10
+    timeOut: 600

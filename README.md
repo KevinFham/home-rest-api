@@ -16,7 +16,11 @@ Install binaries
 
 ```bash
 sudo apt install fping wakeonlan
+
 ```
+
+If you're using Digital Ocean for a VPS, follow the [doctl docs](https://docs.digitalocean.com/reference/doctl/) for info on installing `doctl`
+
 
 ## Deployment
 
@@ -49,6 +53,8 @@ Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` 
 ### Configuration
 
 `mcServer` - Values assume the server runs a [`docker-minecraft-server`](https://github.com/itzg/docker-minecraft-server) container.
+
+`vps` - Assumes using Digital Ocean for VPS
 
 ### Deploy
 
