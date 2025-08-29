@@ -12,7 +12,7 @@
         "dev": "NODE_ENV=development npx tsx watch .",
         "build": "rm -rf build && tspc -p tsconfig.json",
         "staging": "NODE_ENV=staging node build/main.js",
-        "deploy": "NODE_ENV=production pm2 start build/main.js -i 2"
+        "deploy": "NODE_ENV=production pm2 start build/main.js"
     },
     "dependencies": {
         "async-mutex": "^0.5.0",

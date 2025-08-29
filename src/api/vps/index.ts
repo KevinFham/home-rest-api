@@ -10,6 +10,12 @@ class VPSTimer {
     private vpsUpTimerMutex = new Mutex();
     private intervalID!: ReturnType<typeof setInterval> | undefined;
 
+    public constructor() {
+        setInterval(async () => {
+            this.syncVps();
+        }, cfg.vps.syncInterval * 1000);
+    }
+
     public async syncVps(): Promise<void> {
         const isUp = await isMachineUp(cfg.vps.vpsHostname);
         if ( isUp && !this.intervalID ) {
@@ -17,7 +23,8 @@ class VPSTimer {
             this.enableVpsTimer();
         } else if( !isUp && this.intervalID ) {
             this.clearVpsTimer();
-        }
+        } 
+        // Else, it is either up and working, or down and not running
     }
 
     public async enableVpsTimer(): Promise<void> {
@@ -28,13 +35,13 @@ class VPSTimer {
         this.intervalID = setInterval(async () => {
             const release = await this.vpsUpTimerMutex.acquire();
             try {
-                this.vpsUpTimer += 1;
-                await this.syncVps();
+                this.vpsUpTimer += 5;
 
                 if (this.vpsUpTimer > cfg.vps.timeOut) {
+                    console.log('VPS auto shutoff triggered');
                     const { err } = await promiseExec(`doctl compute droplet-action power-off ${cfg.vps.dropletID}`);
                     if ( !err ) {
-                        console.log('VPS auto shutoff triggered');
+                        console.log('VPS shutting off');
                     } else {
                         throw new Error('doctl failed to power off droplet');
                     }
@@ -44,7 +51,7 @@ class VPSTimer {
             } finally {
                 release();
             }
-        }, 1000);
+        }, 5000);
     }
 
     public async refreshVpsTimer(): Promise<void> {
@@ -118,6 +125,10 @@ const actionHandler = async (req: Request, res: Response) => {
     else if ( payload.action === 'refreshVps' ) {
         vpsTimer.refreshVpsTimer();
         res.status(200).send({ code: 0, message: "VPS refreshed" });
+    }
+    else if ( payload.action === 'syncVps' ) {
+        vpsTimer.syncVps();
+        res.status(200).send({ code: 0, message: "VPS synced" });
     }
     else {
         res.status(400).send(`Unknown Action "${payload.action}"`);
