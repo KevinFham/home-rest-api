@@ -17,10 +17,10 @@ async function getMinecraftServerStatus(serverAddress: string, mcServerContainer
         return ServerStatus.ACTIVE;
     } else if ( stdout.includes("starting") ) {
         return ServerStatus.STARTING;
-    } else if ( stdout.includes("exitcode137") && !stdout.includes("exitcode0")) {
-        return ServerStatus.ERROR;
-    } else if ( stdout.includes("exited") ) {
+    } else if ( stdout.includes("exitcode137") || stdout.includes("exitcode0")) {
         return ServerStatus.STOPPED;
+    } else if ( stdout.includes("exited") ) {
+        return ServerStatus.ERROR;
     } else {
         return ServerStatus.UNKNOWN;
     }
