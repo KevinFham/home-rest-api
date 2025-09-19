@@ -2,8 +2,17 @@
 mcServer:
   serverMacAddr: '00:00:00:00'
   serverHostName: 'localhost'
-  mcServerAddr: 'play.addr.mc'
-  mcServerContainerName: 'mc-container-1'
+  # ORDER MATTERS FOR THESE NEXT VALUES
+  mcServerAddr: 
+  - 'play1.addr.mc'
+  - 'play2.addr.mc'
+  mcServerAliases:
+    # api/mc-server calls must contain this in a parameter to specify which server is being called for
+  - 'survival-world'
+  - 'creative-world'
+  mcServerContainerName: 
+  - 'mc-container-1'
+  - 'mc-container-2'
 
 # VPS Config
 vps:
