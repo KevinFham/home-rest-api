@@ -1,6 +1,9 @@
 import 'dotenv/config';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import type { Request, Response } from 'express';
-import { promiseExec, parseConfig, isMachineUp } from '@/src/utils.js';
+import { promiseExec, parseConfig, getOpenApiSpec, isMachineUp } from '@/src/utils.js';
 
 const cfg = parseConfig();
 
@@ -42,8 +45,11 @@ async function getMinecraftServerPlayers(serverAddress: string, mcServerContaine
 }
 
 
+const oApiSpec = getOpenApiSpec(path.join(__dirname, '/api-doc.yml'));
+
 const actionHandler = async ( req: Request, res: Response ) => {
     const payload = req.body;
+    //console.log(req.query.action);
     if( payload === undefined ) { res.status(400).send('Bad Request'); }
     else if ( !( 'action' in payload ) ) { res.status(400).send('Bad Request'); }
 
@@ -168,4 +174,4 @@ const actionHandler = async ( req: Request, res: Response ) => {
 
 }
 
-export { actionHandler };
+export { actionHandler, oApiSpec };

@@ -1,0 +1,12 @@
+responses:
+  200:
+    description: 'Successfully connected with Virtual Private Server API'
+    content:
+      'application/json':
+        schema:
+          type: 'object'
+          properties:
+            code:
+              type: 'integer'
+            message:
+              type: 'string'

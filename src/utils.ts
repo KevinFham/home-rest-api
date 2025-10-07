@@ -23,6 +23,16 @@ const parseConfig = () => {
     return configData;
 }
 
+const getOpenApiSpec = (apiDocPath: string) => {
+    if (!existsSync(apiDocPath)) {
+        console.error(`No ${apiDocPath} file found!`);
+        return { responses: { 501: { description: "API Spec not implemented" } }};
+    } else {
+        return YAML.parse(readFileSync(apiDocPath, 'utf8'));
+    }
+}
+
+
 const isMachineUp = async (serverAddress: string, timeoutms: number = 600): Promise<boolean> => {
     return new Promise( async function(resolve, _) {
         const { err } = await promiseExec(`fping -c1 -t${timeoutms} ${serverAddress}`);
@@ -31,4 +41,4 @@ const isMachineUp = async (serverAddress: string, timeoutms: number = 600): Prom
     });
 }
 
-export { promiseExec, parseConfig, isMachineUp };
+export { promiseExec, parseConfig, getOpenApiSpec, isMachineUp };
