@@ -58,20 +58,42 @@ const apiFiles = await glob(`**/*${FILE_EXTENSION}`, { cwd: foldersPath, absolut
 for (const apiPath of apiFiles) {
     const api = await import(path.join(foldersPath, apiPath));  
     const parsedPath = path.parse(apiPath);
-    if ('actionHandler' in api) {
-        if ('oApiSpec' in api) {
-            server.post(path.join('/api', parsedPath.dir), oapi.path(api.oApiSpec), ( req: Request, res: Response ) => { api.actionHandler( req, res ); });
-            apiRouteStack.push(path.join('/api', parsedPath.dir));
+    if ('GET' in api) {
+        if ('oApiSpec_GET' in api) {
+            server.get(path.join('/api', parsedPath.dir), oapi.path(api.oApiSpec_GET), ( req: Request, res: Response ) => { api.GET( req, res ); });
+            apiRouteStack.push(`${path.join('/api', parsedPath.dir)} (GET)`);
+        } else {
+            console.error(`Failed to get Open API Spec for ${path.join('/api', parsedPath.dir)} (GET)`);
+        }
+    }
+    if ('POST' in api) {
+        if ('oApiSpec_POST' in api) {
+            server.post(path.join('/api', parsedPath.dir), oapi.path(api.oApiSpec_POST), ( req: Request, res: Response ) => { api.POST( req, res ); });
+            apiRouteStack.push(`${path.join('/api', parsedPath.dir)} (POST)`);
         } else {  
-            console.error(`Failed to get Open API Spec for ${path.join('/api', parsedPath.dir)}`);
+            console.error(`Failed to get Open API Spec for ${path.join('/api', parsedPath.dir)} (POST)`);
+        }
+    }
+    if ('PUT' in api) {
+        if ('oApiSpec_PUT' in api) {
+            server.put(path.join('/api', parsedPath.dir), oapi.path(api.oApiSpec_PUT), ( req: Request, res: Response ) => { api.PUT( req, res ); });
+            apiRouteStack.push(`${path.join('/api', parsedPath.dir)} (PUT)`);
+        } else {  
+            console.error(`Failed to get Open API Spec for ${path.join('/api', parsedPath.dir)} (PUT)`);
+        }
+    }
+    if ('DELETE' in api) {
+        if ('oApiSpec_DELETE' in api) {
+            server.delete(path.join('/api', parsedPath.dir), oapi.path(api.oApiSpec_DELETE), ( req: Request, res: Response ) => { api.DELETE( req, res ); });
+            apiRouteStack.push(`${path.join('/api', parsedPath.dir)} (DELETE)`);
+        } else {  
+            console.error(`Failed to get Open API Spec for ${path.join('/api', parsedPath.dir)} (DELETE)`);
         }
     }
 }
 
 
 console.log('Server Routes:');
-server.router.stack.forEach((r) => { 
-    if(r.name === 'handle') { console.log(`- ${r!.route!.path}`); } 
-});
+apiRouteStack.forEach((route) => { console.log(`- ${route}`); });
 
 server.listen(process.env['SERVER_PORT'], () => { console.log(`Server listening on http://localhost:${process.env['SERVER_PORT']}`) });

@@ -28,7 +28,13 @@ const getOpenApiSpec = (apiDocPath: string) => {
         console.error(`No ${apiDocPath} file found!`);
         return { responses: { 501: { description: "API Spec not implemented" } }};
     } else {
-        return YAML.parse(readFileSync(apiDocPath, 'utf8'));
+        const oApiSpec = YAML.parse(readFileSync(apiDocPath, 'utf8'));
+        const oApiSpec_GET = ('GET' in oApiSpec) ? oApiSpec.GET : false;
+        const oApiSpec_POST = ('POST' in oApiSpec) ? oApiSpec.POST : false;
+        const oApiSpec_PUT = ('PUT' in oApiSpec) ? oApiSpec.PUT : false;
+        const oApiSpec_DELETE = ('DELETE' in oApiSpec) ? oApiSpec.DELETE : false;
+
+        return { oApiSpec_GET, oApiSpec_POST, oApiSpec_PUT, oApiSpec_DELETE };
     }
 }
 

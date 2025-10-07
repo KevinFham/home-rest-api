@@ -1,7 +1,7 @@
 GET:
   responses:
     200:
-      description: 'Successfully connected with MC Server API \n bottom text'
+      description: 'Successfully connected with Machine Control API'
       content:
         'application/json':
           schema:
@@ -14,7 +14,7 @@ GET:
 PUT:
   responses:
     200:
-      description: 'Successfully connected with MC Server API \n bottom text'
+      description: 'Successfully connected with Machine Control API'
       content:
         'application/json':
           schema:
