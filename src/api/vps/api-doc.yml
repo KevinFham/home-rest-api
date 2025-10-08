@@ -1,7 +1,10 @@
 GET:
+  tags:
+    - 'Virtual Private Server'
+  summary: 'Get the on/off status of the VPS'
   responses:
     200:
-      description: 'Successfully connected with Virtual Private Server API'
+      description: 'The on/off status of the VPS. Code 0: Success, Code 1: Failure'
       content:
         'application/json':
           schema:
@@ -11,10 +14,50 @@ GET:
                 type: 'integer'
               message:
                 type: 'string'
+          example:
+            code: 0
+            message: 'VPS is up'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'
+
 PUT:
+  tags:
+    - 'Virtual Private Server'
+  summary: 'Control the VPS (via doctl)'
+  requestBody:
+    description: 'Control specifications for the VPS'
+    required: true
+    content:
+      application/json:
+        schema:
+          type: 'object'
+          properties:
+            action:
+              type: 'string'
+        examples:
+          startVps:
+            summary: 'Start the VPS'
+            value:
+              action: 'startVps'
+          stopVps:
+            summary: 'Stop the VPS'
+            value:
+              action: 'stopVps'
+          refreshVps:
+            summary: 'Refresh the VPS up timer'
+            value:
+              action: 'refreshVps'
+          syncVps:
+            summary: 'Synchronize a timer to the VPS, in case one is not running'
+            value:
+              action: 'syncVps'
   responses:
     200:
-      description: 'Successfully connected with Virtual Private Server API'
+      description: 'Successful communication with VPS Control API'
       content:
         'application/json':
           schema:
@@ -24,3 +67,18 @@ PUT:
                 type: 'integer'
               message:
                 type: 'string'
+          examples:
+            startVps:
+              value:
+                code: 0
+                message: 'Starting up VPS!'
+            stopVps:
+              value:
+                code: 0
+                message: 'Shutting down VPS!'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'

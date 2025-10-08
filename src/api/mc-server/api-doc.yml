@@ -1,7 +1,18 @@
 GET:
+  tags:
+    - 'Minecraft Server'
+  summary: 'Get the status of a Minecraft server'
+  parameters:
+    - name: 'mcInstance'
+      description: 'The alias of the Minecraft server instance, registered in config.yml'
+      in: 'query'
+      required: true
+      schema:
+        type: 'string'
+      example: 'survival-world'
   responses:
     200:
-      description: 'Successfully connected with MC Server API \n bottom text'
+      description: 'Detailed status of the minecraft server, including connected players. Code 0: Success, Code 1: Failure'
       content:
         'application/json':
           schema:
@@ -9,12 +20,77 @@ GET:
             properties:
               code:
                 type: 'integer'
+              serverStat:
+                type: 'string'
+              players:
+                type: 'array'
+                items: 
+                  type: 'string'
               message:
                 type: 'string'
+          examples:
+            running:
+              summary: 'Active Minecraft server with connected players'
+              value:
+                code: 0
+                serverStat: 'running'
+                players: ['palm_knee', 'TheDarkLord', 'xX_baconEggCheese_Xx']
+                message: 'Minecraft server is up and running!'
+            exited:
+              summary: 'Inactive Minecraft server'
+              value:
+                code: 0
+                serverStat: 'exited'
+                players: []
+                message: 'Minecraft server is shut down!'
+            error:
+              summary: 'Minecraft server error (likely due to initialization and startup issue)'
+              value:
+                code: 1
+                serverStat: 'error'
+                players: []
+                message: 'Minecraft server has an error!'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'
+
 PUT:
+  tags:
+    - 'Minecraft Server'
+  summary: 'Control a Minecraft server on a LAN machine'
+  parameters:
+    - name: 'mcInstance'
+      description: 'The alias of the Minecraft server instance, registered in config.yml'
+      in: 'query'
+      required: true
+      schema:
+        type: 'string'
+      example: 'survival-world'
+  requestBody:
+    description: 'Control specifications for the Minecraft server'
+    required: true
+    content:
+      application/json:
+        schema:
+          type: 'object'
+          properties:
+            action:
+              type: 'string'
+        examples:
+          startMinecraftServer:
+            summary: 'Start the Minecraft server instance'
+            value:
+              action: 'startMinecraftServer'
+          stopMinecraftSeerver:
+            summary: 'Stop the Minecraft server instance'
+            value:
+              action: 'stopMinecraftServer'
   responses:
     200:
-      description: 'Successfully connected with MC Server API \n bottom text'
+      description: 'Successful communication with Minecraft Server Control API'
       content:
         'application/json':
           schema:
@@ -24,3 +100,25 @@ PUT:
                 type: 'integer'
               message:
                 type: 'string'
+          examples:
+            successStartup:
+              summary: 'Successful { action: "startMinecraftServer" } response'
+              value:
+                code: 0
+                message: 'Starting Minecraft server!'
+            successShutdown:
+              summary: 'Successful { action: "stopMinecraftServer" } response'
+              value:
+                code: 0
+                message: 'Shutting down Minecraft server...'
+            activeSessionShutdown:
+              summary: 'Shutdown abort message when detecting connected players'
+              value:
+                code: 1
+                message: '3 players online! Aborting shutdown.'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'

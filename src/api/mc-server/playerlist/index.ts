@@ -25,7 +25,7 @@ const GET = async ( req: Request, res: Response ) => {
                     players: currentlyOnline 
                 }) });
             } else {
-                res.status(200).send({ code: 1, message: "No players currently online." });
+                res.status(200).send({ code: 1, message: "Minecraft server is shut down." });
             }
         } else {
             res.status(200).send({ code: 1, message: "Minecraft server is down because machine is down!" });

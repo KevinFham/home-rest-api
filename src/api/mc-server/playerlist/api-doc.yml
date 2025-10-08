@@ -1,7 +1,18 @@
 GET:
+  tags:
+    - 'Minecraft Server'
+  summary: 'Get the list of players connected to a Minecraft server'
+  parameters:
+    - name: 'mcInstance'
+      description: 'The alias of the Minecraft server instance, registered in config.yml'
+      in: 'query'
+      required: true
+      schema:
+        type: 'string'
+      example: 'survival-world'
   responses:
     200:
-      description: 'Successfully connected with MC Server API \n bottom text'
+      description: 'A stringified object containing player count and all players connected to a running instance (Code 0) or a message reasoning why there are no players connected (Code 1)'
       content:
         'application/json':
           schema:
@@ -11,3 +22,25 @@ GET:
                 type: 'integer'
               message:
                 type: 'string'
+          examples:
+            activeSession:
+              summary: 'Active Minecraft server with connected players'
+              value:
+                code: 0
+                message: '{"playerCount":3,"players":["palm_knee","TheDarkLord","xX_baconEggCheese_Xx"]}'
+            idleSession:
+              summary: 'Active Minecraft server with no connected players'
+              value:
+                code: 0
+                message: '{"playerCount":0,"players":[]}'
+            shutdown:
+              summary: 'Inactive Minecraft server, thus no connected players'
+              value:
+                code: 1
+                message: 'Minecraft server is shut down.'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'

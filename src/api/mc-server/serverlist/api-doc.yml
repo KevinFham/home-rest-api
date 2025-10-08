@@ -1,7 +1,10 @@
 GET:
+  tags:
+    - 'Minecraft Server'
+  summary: 'Get a list of registered Minecraft servers'
   responses:
     200:
-      description: 'Successfully connected with MC Server API \n bottom text'
+      description: 'A stringified object containing all registered Minecraft server aliases and their server addresses'
       content:
         'application/json':
           schema:
@@ -11,3 +14,15 @@ GET:
                 type: 'integer'
               message:
                 type: 'string'
+          examples:
+            activeSession:
+              summary: 'Registered survival and creative world'
+              value:
+                code: 0
+                message: '{"mcServerAliases":["survival-world","creative-world"],"mcServerAddrs":["play1.addr.mc","play2.addr.mc"]}'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'

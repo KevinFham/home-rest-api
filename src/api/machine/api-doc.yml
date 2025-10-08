@@ -1,7 +1,18 @@
 GET:
+  tags:
+    - 'LAN Devices'
+  summary: 'Get the on/off status of a machine on LAN, given its hostname'
+  parameters:
+    - name: 'machineHostname'
+      description: 'Hostname of the machine on its network'
+      in: 'query'
+      required: true
+      schema:
+        type: 'string'
+      example: 'media.server'
   responses:
     200:
-      description: 'Successfully connected with Machine Control API'
+      description: 'The on/off status of the machine. Code 0: Success, Code 1: Failure'
       content:
         'application/json':
           schema:
@@ -11,10 +22,50 @@ GET:
                 type: 'integer'
               message:
                 type: 'string'
+          example:
+            code: 0
+            message: 'Machine is up'
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'
+
 PUT:
+  tags:
+    - 'LAN Devices'
+  summary: 'Control a machine on LAN, given its hostname'
+  parameters:
+    - name: 'machineHostname'
+      description: 'Hostname of the machine on its network'
+      in: 'query'
+      required: true
+      schema:
+        type: 'string'
+      example: 'media.server'
+  requestBody:
+    description: 'Control specifications for the machine'
+    required: true
+    content:
+      application/json:
+        schema:
+          type: 'object'
+          properties:
+            action:
+              type: 'string'
+        examples:
+          startMachine:
+            summary: 'Start the machine via magic packet'
+            value:
+              action: 'startMachine'
+          stopMachine:
+            summary: 'Stop the machine (if the machine provides root access from this server)'
+            value:
+              action: 'stopMachine'
   responses:
     200:
-      description: 'Successfully connected with Machine Control API'
+      description: 'Successful communication with Machine Control API'
       content:
         'application/json':
           schema:
@@ -24,3 +75,12 @@ PUT:
                 type: 'integer'
               message:
                 type: 'string'
+          example:
+            code: 0
+            message: "Starting Machine"
+    400:
+      description: 'Unexpected error'
+      content:
+        'text':
+          schema:
+            type: 'string'

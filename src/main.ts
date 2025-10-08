@@ -43,7 +43,7 @@ const oapi = openapi({
     openapi: '3.0.0',
     info: {
         title: 'Home REST API Server',
-        description: 'API documentation',
+        description: 'API documentation for [https://github.com/KevinFham/home-rest-api](https://github.com/KevinFham/home-rest-api)',
         version: '1.0.0',
     }});
 server.use( express.json() );
