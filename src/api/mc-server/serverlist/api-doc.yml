@@ -1,0 +1,13 @@
+GET:
+  responses:
+    200:
+      description: 'Successfully connected with MC Server API \n bottom text'
+      content:
+        'application/json':
+          schema:
+            type: 'object'
+            properties:
+              code:
+                type: 'integer'
+              message:
+                type: 'string'

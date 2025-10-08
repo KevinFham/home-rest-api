@@ -1,8 +1,17 @@
+# LAN Machines Config
+machines:
+    # ORDER MATTERS FOR THESE VALUES
+    machineHostnames:
+    - 'localhost'
+    - 'media.server'
+    machineMacAddrs:
+    - '00:00:00:00:00:00'
+    - '00:00:00:00:00:01'
+
 # Minecraft Server Config
 mcServer:
-  serverMacAddr: '00:00:00:00'
   serverHostName: 'localhost'
-  # ORDER MATTERS FOR THESE NEXT VALUES
+  # ORDER MATTERS FOR THESE VALUES
   mcServerAddr: 
   - 'play1.addr.mc'
   - 'play2.addr.mc'

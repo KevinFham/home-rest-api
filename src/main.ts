@@ -95,5 +95,6 @@ for (const apiPath of apiFiles) {
 
 console.log('Server Routes:');
 apiRouteStack.forEach((route) => { console.log(`- ${route}`); });
+console.log('View Full OpenAPI Spec at http://localhost:3001/api-docs')
 
 server.listen(process.env['SERVER_PORT'], () => { console.log(`Server listening on http://localhost:${process.env['SERVER_PORT']}`) });

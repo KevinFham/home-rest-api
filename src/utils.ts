@@ -34,7 +34,7 @@ const getOpenApiSpec = (apiDocPath: string) => {
         const oApiSpec_PUT = ('PUT' in oApiSpec) ? oApiSpec.PUT : false;
         const oApiSpec_DELETE = ('DELETE' in oApiSpec) ? oApiSpec.DELETE : false;
 
-        return { oApiSpec_GET, oApiSpec_POST, oApiSpec_PUT, oApiSpec_DELETE };
+        return { oApiSpec, oApiSpec_GET, oApiSpec_POST, oApiSpec_PUT, oApiSpec_DELETE };
     }
 }
 
