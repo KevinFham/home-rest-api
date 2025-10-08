@@ -10,7 +10,7 @@
     "scripts": {
         "prepare": "ts-patch install -s",
         "dev": "NODE_ENV=development npx tsx watch .",
-        "build": "rm -rf build && tspc -p tsconfig.json",
+        "build": "rm -rf build && mkdir build && find src/ -name '*.yml' -exec cp --parents -t build {} \\; && mv build/src/* build/ && rmdir build/src && tspc -p tsconfig.json",
         "staging": "NODE_ENV=staging node build/main.js",
         "deploy": "NODE_ENV=production pm2 start build/main.js --name home-rest-api --cron-restart=\"0 5 * * *\""
     },
