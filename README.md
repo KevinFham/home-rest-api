@@ -52,6 +52,8 @@ Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` 
 
 ### Configuration
 
+`machines` - Register of all LAN devices acessible to the server
+
 `mcServer` - Values assume the server runs a [`docker-minecraft-server`](https://github.com/itzg/docker-minecraft-server) container.
 
 `vps` - Assumes using Digital Ocean for VPS
@@ -68,6 +70,9 @@ pnpm run deploy
 The server will run on the port `SERVER_PORT` specified by `.env`
 
 ## APIs
+See `http://localhost:<SERVER_PORT>/api-docs` for further documentation
+
+`/api/machine` - LAN Device control
 
 `/api/mc-server` - Minecraft Server home control
 
