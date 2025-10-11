@@ -11,13 +11,13 @@ const promiseExec = async (command: string): Promise<{stdout: string, stderr: st
     });
 }
 
-const parseConfig = () => {
-    if (!existsSync('./config.yml')) {
-        console.error('No config.yml file found!');
+const parseConfig = (configPath: string = './config.yml') => {
+    if (!existsSync(configPath)) {
+        console.error(`No ${configPath} file found!`);
         process.exit(0);
     }
 
-    const file = readFileSync('./config.yml', 'utf8');
+    const file = readFileSync(configPath, 'utf8');
     let configData = YAML.parse(file);
 
     return configData;

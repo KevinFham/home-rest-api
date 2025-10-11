@@ -47,6 +47,7 @@
 
     // Pathing
     "baseUrl": "./",
+    //"rootDir": "./src",
     "paths": {
         "@/src/*": [
             "src/*"
@@ -59,6 +60,6 @@
   ],
   "exclude": [
     "**/node_modules",
-    "types",
+    "**/tests",
   ]
 }
