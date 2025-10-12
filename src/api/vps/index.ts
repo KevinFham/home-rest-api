@@ -89,9 +89,9 @@ const { oApiSpec_GET, oApiSpec_PUT } = getOpenApiSpec(path.join(__dirname, '/api
 const GET = async (_req: Request, res: Response) => {
     const isUp = await isMachineUp(cfg.vps.vpsHostname);
     if ( isUp ) {
-        res.status(200).send({ code: 0, message: "VPS is up" });
+        res.status(200).send({ code: 0, message: "VPS is up." });
     } else {
-        res.status(200).send({ code: 1, message: "VPS is down" });
+        res.status(200).send({ code: 1, message: "VPS is down." });
     }
     return;
 }
@@ -131,14 +131,14 @@ const PUT = async (req: Request, res: Response) => {
         }
         else if ( payload.action === 'refreshVps' ) {
             vpsTimer.refreshVpsTimer();
-            res.status(200).send({ code: 0, message: "VPS refreshed" });
+            res.status(200).send({ code: 0, message: "VPS refreshed." });
         }
         else if ( payload.action === 'syncVps' ) {
             vpsTimer.syncVps();
-            res.status(200).send({ code: 0, message: "VPS synced" });
+            res.status(200).send({ code: 0, message: "VPS synced." });
         }
         else {
-            res.status(400).send(`Unknown Action "${payload.action}"`);
+            res.status(400).send(`Unknown Action "${payload.action}".`);
         }
         
         return;

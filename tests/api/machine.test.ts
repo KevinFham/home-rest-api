@@ -1,20 +1,34 @@
 import { beforeEach, vi } from 'vitest';
 import { fs, vol } from 'memfs';
-import { GET, PUT } from '../src/utils.ts';
+import { GET, PUT } from '../../src/api/machine/index.ts';
+import { mockRequest, mockResponse } from '../express-mocks.ts';
 
+test('GET', async () => {
+    vi.mock('../../src/api/machine/utils.js', () => { return { MachineAddrDict: { localhost: '127.0.0.1' } }; });
 
-vi.mock('node:fs');
-vi.mock('node:fs/promises');
+    const res = mockResponse();
+    await GET(mockRequest('localhost'), res);
+    expect(res._status).toBe(200);
+    expect(res._send).toStrictEqual({code: 0, message: 'Machine is up!'});
 
-beforeEach(() => {
-    vol.reset();
-})
+    await GET(mockRequest('unregisteredhost'), res);
+    expect(res._status).toBe(200);
+    expect(res._send).toStrictEqual({code: 1, message: '"unregisteredhost" is not a registered hostname.'});
+});
 
-//test('"fping" and "wakeonlan" binaries', async () => {
-//    expect((await promiseExec('fping -c1 -t600 0.1.1.1')).stderr).toBeTruthy();
-//    expect((await promiseExec('fping localhost')).stdout).toBeTruthy();
-//
-//    expect((await promiseExec('wakeonlan 00:00:00:00:00')).stderr).toBeTruthy();
-//})
+test('PUT', async () => {
+    vi.mock('../../src/api/machine/utils.js', () => { return { MachineAddrDict: { localhost: '127.0.0.1' } }; });
 
+    const res = mockResponse();
+    await PUT(mockRequest('localhost', 'startMachine'), res);
+    expect(res._status).toBe(200);
+    expect(res._send).toStrictEqual({code: 0, message: 'Starting Machine!'});
 
+    await PUT(mockRequest('unregisteredhost', 'startMachine'), res);
+    expect(res._status).toBe(200);
+    expect(res._send).toStrictEqual({code: 1, message: '"unregisteredhost" is not a registered hostname.'});
+
+    await PUT(mockRequest('localhost', 'unknownAction'), res);
+    expect(res._status).toBe(400);
+    expect(res._send).toBe('Unknown Action "unknownAction".');
+});

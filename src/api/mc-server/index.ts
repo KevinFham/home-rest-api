@@ -90,7 +90,7 @@ const PUT = async ( req: Request, res: Response ) => {
             }
         }
         else {                                                                              // Unknown Action
-            res.status(400).send(`Unknown Action "${payload.action}"`);
+            res.status(400).send(`Unknown Action "${payload.action}".`);
         }
 
         return;
