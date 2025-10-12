@@ -1,10 +1,8 @@
-export const mockRequest = (hostname: string = 'localhost', action: string = '') => {
+export const mockRequest = (req: { query?: {}, action?: string }) => {
     return {
-        query: {
-            machineHostname: hostname
-        },
+        query: req.query,
         body: {
-            action: action
+            action: req.action
         }
     };
 };
