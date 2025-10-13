@@ -16,6 +16,7 @@ const cfg = parseConfig();
 const requiredBin = [
     'fping',
     'wakeonlan',
+    'doctl',
 ]
 if ('dropletID' in cfg.vps) { requiredBin.push('doctl'); }
 
@@ -32,7 +33,6 @@ if (process.env['PATH']) {
         }
         if (!binFound) {
             console.error(`Required executable "${bin}" not found in $PATH!`);
-            process.exit(1);
         }
     });
 }

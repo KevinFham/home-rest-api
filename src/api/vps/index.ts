@@ -9,14 +9,43 @@ import { promiseExec, parseConfig, getOpenApiSpec, isMachineUp } from '@/src/uti
 const cfg = parseConfig();
 
 class VPSTimer {
+    //private _doctlUp = this.setUpDoctl();   // Unused property; documented for future implementations
     private vpsUpTimer = 0;
     private vpsUpTimerMutex = new Mutex();
     private intervalID!: ReturnType<typeof setInterval> | undefined;
 
     public constructor() {
+        // Sync occasionally in case of mismatched state
         setInterval(async () => {
             this.syncVps();
         }, cfg.vps.syncInterval * 1000);
+
+        this.setUpDoctl();
+    }
+
+    public async setUpDoctl(): Promise<boolean> {
+        return new Promise<boolean>(async function(resolve, _) {
+            var { err } = await promiseExec(`doctl account get`);
+            if (!err) { 
+                console.log('Successfully authenticated doctl');
+                resolve(true); 
+            }
+            else if (process.env['DIGITAL_OCEAN_API_TOKEN']) {
+                var { err } = await promiseExec(`doctl auth init -t ${process.env['DIGITAL_OCEAN_API_TOKEN']}`);
+                if (!err) { 
+                    console.log('Successfully authenticated doctl');
+                    resolve(true); 
+                }
+                else {
+                    console.error('DIGITAL_OCEAN_API_TOKEN contains an invalid API token');
+                    resolve(false);
+                }
+            }
+            else {  
+                console.error('Missing DIGITAL_OCEAN_API_TOKEN in .env');
+                resolve(false);
+            }
+        });
     }
 
     public async syncVps(): Promise<void> {

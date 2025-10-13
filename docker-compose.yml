@@ -1,0 +1,23 @@
+services:
+  # Main REST API server
+  api-server:
+    image: kevinfham:test
+    container_name: api-server
+    network_mode: host
+#    ports:
+#      - "${SERVER_PORT:-3001}:${SERVER_PORT:-3001}"
+    volumes:
+      - './.env:/app/.env:ro'
+      - './config.yml:/app/config.yml:ro'
+      - '/home/kevin/.ssh/id_ed25519:/root/.ssh/id_ed25519:ro'
+      - '/home/kevin/.ssh/known_hosts:/root/.ssh/known_hosts:ro'
+    restart: always
+#  nginx:
+#    image: ghcr.io/nginxinc/nginx-unprivileged:stable-alpine
+#    volumes:
+#      - './nginx-config/api-server.conf:/etc/nginx/conf.d/default.conf:ro'
+#    restart: always
+
+#networks:
+#  frontend: {}
+#  backend: {}
