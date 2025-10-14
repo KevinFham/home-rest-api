@@ -1,6 +1,8 @@
-import { promiseExec, parseConfig } from '@/src/utils.js';
+import { DockerContext, parseConfig } from '@/src/utils.js';
 
 const cfg = parseConfig();
+
+export const McDockerContext = new DockerContext(cfg.mcServer.serverHostName);
 
 export enum ServerStatus {
     STOPPED = "STOPPED",
@@ -16,8 +18,8 @@ export enum ServerStatus {
 */
 export const ServerAliasDict = Object.assign({}, ...cfg.mcServer.mcServerAliases.map((key: string) => ({[key]: cfg.mcServer.mcServerContainerNames[cfg.mcServer.mcServerAliases.indexOf(key)]})));
 
-export async function getMinecraftServerStatus(serverAddress: string, mcServerContainerName: string): Promise<ServerStatus> {
-    const { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker container inspect -f '{{.State.Status}}, {{.State.Health}} exitcode{{.State.ExitCode}}' ${mcServerContainerName}"`);
+export async function getMinecraftServerStatus(mcServerContainerName: string): Promise<ServerStatus> {
+    const { stdout } = await McDockerContext.run(`docker container inspect -f '{{.State.Status}}, {{.State.Health}} exitcode{{.State.ExitCode}}' ${mcServerContainerName}`); 
     if ( stdout.includes("running") && stdout.includes("healthy") ) {
         return ServerStatus.ACTIVE;
     } else if ( stdout.includes("starting") ) {
@@ -31,14 +33,14 @@ export async function getMinecraftServerStatus(serverAddress: string, mcServerCo
     }
 }
 
-export async function getMinecraftServerPlayers(serverAddress: string, mcServerContainerName: string): Promise<string[]> {
-    return new Promise( async function(resolve, reject) {
-        try {
-            var { stdout } = await promiseExec(`ssh -t root@${serverAddress} "docker exec ${mcServerContainerName} rcon-cli \"list\" | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/^[0-9a-zA-Z ]*: '//g -e 's/ //g'"`);
-            resolve(stdout.trim().split(",").filter((x: string) => x));
-        } catch (err) {
-            console.log(err);
-            reject(err);
+export async function getMinecraftServerPlayers(mcServerContainerName: string): Promise<string[]> {
+    return new Promise( async function(resolve, _) {
+        var { stdout, stderr, err } = await McDockerContext.run(`docker exec ${mcServerContainerName} rcon-cli \"list\" | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/^[0-9a-zA-Z ]*: '//g -e 's/ //g'`);
+        if (err) {
+            console.error(stderr);
+            resolve([]); return;
         }
+
+        resolve(stdout.trim().split(",").filter((x: string) => x));
     });
 }

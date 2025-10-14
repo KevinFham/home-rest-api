@@ -47,4 +47,70 @@ const isMachineUp = async (serverAddress: string, timeoutms: number = 600): Prom
     });
 }
 
-export { promiseExec, parseConfig, getOpenApiSpec, isMachineUp };
+class DockerContext {
+    private contextUp = false;
+    private hostname;
+    private protocol;
+    private port;
+
+    public async isContextUp() { return this.contextUp; }
+
+    public constructor(hostname: string, port: number = 2376, protocol: string = 'tcp://') {
+        this.hostname = hostname;
+        this.protocol = protocol;
+        this.port = port;
+    }
+
+    private async initContext(hostname: string, port: number, protocol: string): Promise<boolean> {
+        this.contextUp = await new Promise<boolean>(async function(resolve, _) {
+            // Check host connection
+            if (!await isMachineUp(hostname)) {
+                console.error(`Failed to connect to ${hostname}.`);
+                resolve(false); return;
+            }
+
+            // Check docker socket
+            var { err } = await promiseExec(`docker -H ${protocol}${hostname}:${port} version`);
+            if (err) {
+                console.error(`Failed to connect to docker socket at ${protocol}${hostname}:${port}: ${err}`);
+                resolve(false); return;
+            }
+
+            // Attempt to create/update context
+            var { stderr, err } = await promiseExec(`docker context create --docker="host=${protocol}${hostname}:${port}" ${hostname}`);
+            if (stderr.includes('already exists')) {
+                var { err } = await promiseExec(`docker context update --docker="host=${protocol}${hostname}:${port}" ${hostname}`);
+                if (err) {
+                    console.error(`Failed to update context for ${hostname}: ${err}`)
+                    resolve(false); return;
+                }
+                console.log(`Successfully started context for ${hostname}!`);
+                resolve(true); return;
+            }  else if (err) {
+                console.error(`Failed to create context for ${hostname}: ${err}`)
+                resolve(false); return;
+            }
+
+            console.log(`Successfully started context for ${hostname}!`);
+            resolve(true); return;
+            
+        });
+        return this.contextUp;
+    }
+
+    public async run(cmd: string): Promise<{stdout: string, stderr: string, err: ExecException | null}> {
+        if (this.contextUp || (!this.contextUp && await this.initContext(this.hostname, this.port, this.protocol))) {
+            await promiseExec(`docker context use ${this.hostname}`);
+            return promiseExec(cmd);
+        } 
+        else {
+            return {
+                stdout: '',
+                stderr: 'Error: Failed to initialize context.',
+                err: Error('Failed to initialize context.')
+            }
+        }
+    }
+}
+
+export { DockerContext, promiseExec, parseConfig, getOpenApiSpec, isMachineUp };

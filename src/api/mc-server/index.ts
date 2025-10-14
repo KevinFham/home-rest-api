@@ -3,10 +3,11 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import type { Request, Response } from 'express';
-import { promiseExec, parseConfig, getOpenApiSpec, isMachineUp } from '@/src/utils.js';
-import { ServerStatus, ServerAliasDict, getMinecraftServerStatus, getMinecraftServerPlayers } from '@/src/api/mc-server/utils.js';
+import { parseConfig, getOpenApiSpec, isMachineUp } from '@/src/utils.js';
+import { McDockerContext, ServerStatus, ServerAliasDict, getMinecraftServerStatus, getMinecraftServerPlayers } from '@/src/api/mc-server/utils.js';
 
 const cfg = parseConfig();
+
 
 const { oApiSpec_GET, oApiSpec_PUT } = getOpenApiSpec(path.join(__dirname, '/api-doc.yml'));
 
@@ -17,9 +18,9 @@ const GET = async ( req: Request, res: Response ) => {
     else { 
         var isUp = await isMachineUp(cfg.mcServer.serverHostName);
         if ( isUp ) {
-            const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+            const mcStatus = await getMinecraftServerStatus(ServerAliasDict[mcInstance]);
             if ( mcStatus === ServerStatus.ACTIVE ) {
-                const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+                const currentlyOnline = await getMinecraftServerPlayers(ServerAliasDict[mcInstance]);
                 res.status(200).send({ code: 0, serverStat: "running", players: currentlyOnline, message: "Minecraft server is up and running!" });
             } else if ( mcStatus === ServerStatus.STARTING ) {
                 res.status(200).send({ code: 0, serverStat: "starting", players: [], message: "Minecraft server is starting!" });
@@ -49,13 +50,13 @@ const PUT = async ( req: Request, res: Response ) => {
         if ( payload.action === 'startMinecraftServer' ) {                                  // Start Minecraft Server
             const isUp = await isMachineUp(cfg.mcServer.serverHostName);
             if ( isUp ) {
-                const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+                const mcStatus = await getMinecraftServerStatus(ServerAliasDict[mcInstance]);
                 if ( mcStatus === ServerStatus.ACTIVE ) {
                     res.status(200).send({ code: 1, message: "Minecraft server is already up and running!" });
                 } else if ( mcStatus === ServerStatus.STARTING ) {
                     res.status(200).send({ code: 1, message: "Minecraft server is already starting!" });
                 } else if ( mcStatus === ServerStatus.STOPPED || mcStatus === ServerStatus.ERROR ) {
-                    await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker start ${ServerAliasDict[mcInstance]}"`); 
+                    await McDockerContext.run(`docker start ${ServerAliasDict[mcInstance]}`);
                     res.status(200).send({ code: 0, message: "Starting Minecraft server!" });
                 } else {
                     res.status(200).send({ code: 1, message: "Minecraft server status unknown." });
@@ -68,11 +69,11 @@ const PUT = async ( req: Request, res: Response ) => {
         else if ( payload.action === 'stopMinecraftServer' ) {                              // Stop Minecraft Server
             const isUp = await isMachineUp(cfg.mcServer.serverHostName);
             if ( isUp ) {
-                const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+                const mcStatus = await getMinecraftServerStatus(ServerAliasDict[mcInstance]);
                 if ( mcStatus === ServerStatus.ACTIVE ) {
-                    const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+                    const currentlyOnline = await getMinecraftServerPlayers(ServerAliasDict[mcInstance]);
                     if ( !( currentlyOnline.length > 0 ) ) {
-                        await promiseExec(`ssh -t root@${cfg.mcServer.serverHostName} "docker exec ${ServerAliasDict[mcInstance]} rcon-cli \"stop\""`);
+                        await McDockerContext.run(`docker exec ${ServerAliasDict[mcInstance]} rcon-cli \"stop\"`);
                         res.status(200).send({ code: 0, message: "Shutting down Minecraft server..." });
                     } else {
                         res.status(200).send({ code: 1, message: `${currentlyOnline.length} players online! Aborting shutdown.` });

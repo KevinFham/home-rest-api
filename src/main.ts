@@ -16,6 +16,7 @@ const cfg = parseConfig();
 const requiredBin = [
     'fping',
     'wakeonlan',
+    'docker',
     'doctl',
 ]
 if ('dropletID' in cfg.vps) { requiredBin.push('doctl'); }

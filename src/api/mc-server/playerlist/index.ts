@@ -17,9 +17,9 @@ const GET = async ( req: Request, res: Response ) => {
     else { 
         var isUp = await isMachineUp(cfg.mcServer.serverHostName);
         if ( isUp ) {
-            const mcStatus = await getMinecraftServerStatus(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+            const mcStatus = await getMinecraftServerStatus(ServerAliasDict[mcInstance]);
             if ( mcStatus === ServerStatus.ACTIVE ) {
-                const currentlyOnline = await getMinecraftServerPlayers(cfg.mcServer.serverHostName, ServerAliasDict[mcInstance]);
+                const currentlyOnline = await getMinecraftServerPlayers(ServerAliasDict[mcInstance]);
                 res.status(200).send({ code: 0, message: JSON.stringify({
                     playerCount: currentlyOnline.length, 
                     players: currentlyOnline 

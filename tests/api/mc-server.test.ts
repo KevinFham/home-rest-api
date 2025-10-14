@@ -6,6 +6,7 @@ beforeAll(async () => {
     vi.mock('../../src/utils.js', async (importOriginal) => {
         const actual = await importOriginal();
         return {
+            DockerContext: actual.DockerContext,
             promiseExec: actual.promiseExec,
             parseConfig(configPath: string) {
                 return {
@@ -26,6 +27,7 @@ beforeAll(async () => {
     vi.mock('../../src/api/mc-server/utils.js', async (importOriginal) => { 
         const actual = await importOriginal();
         return { 
+            McDockerContext: actual.McDockerContext,
             ServerStatus: actual.ServerStatus,
             ServerAliasDict: { 
                 "survival-world-active": 'survival_world_active',
@@ -35,7 +37,7 @@ beforeAll(async () => {
                 "survival-world-error": 'survival_world_error',
                 "survival-world-unknown": 'survival_world_unknown'
             },
-            getMinecraftServerStatus(serverAddress: string = 'localhost', mcServerContainerName: string) {
+            getMinecraftServerStatus(mcServerContainerName: string) {
                 if (mcServerContainerName.includes('survival_world_active')) { return actual.ServerStatus.ACTIVE; }
                 else if (mcServerContainerName.includes('survival_world_active_idle')) { return actual.ServerStatus.STARTING; }
                 else if (mcServerContainerName.includes('survival_world_starting')) { return actual.ServerStatus.STARTING; }
@@ -43,7 +45,7 @@ beforeAll(async () => {
                 else if (mcServerContainerName.includes('survival_world_error')) { return actual.ServerStatus.ERROR; }
                 else { return actual.ServerStatus.UNKNOWN; }
             },
-            getMinecraftServerPlayers(serverAddress: string = 'localhost', mcServerContainerName: string) {
+            getMinecraftServerPlayers(mcServerContainerName: string) {
                 if (mcServerContainerName.includes('survival_world_active') && !mcServerContainerName.includes('idle')) { return [ 'palm_knee', 'TheDarkLord', 'xX_baconeggcheese_Xx' ]; }
                 else { return []; }
             }
