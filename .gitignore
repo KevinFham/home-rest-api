@@ -7,6 +7,9 @@ build/
 # Etc
 nginx-config/*
 !nginx-config/example-api-server.conf
+*.pem
+*.key
+*.srl
 
 # Logs
 logs
