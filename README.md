@@ -22,11 +22,11 @@ TODO: Figure out K3s (in tandem with Prometheus) for monitoring and React DOM (n
 sudo apt install fping wakeonlan
 ```
 
-## Configuration
+# Configuration
 
 Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` to `config.yml` and set all values.
 
-### Configure `config.yml`
+## Configure `config.yml`
 
 `machines` - Register of all LAN devices acessible to the server
 
@@ -34,7 +34,7 @@ Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` 
 
 `vps` - Developed mainly using Digital Ocean for VPS control
 
-### Configure `docker` control
+## Configure `docker` control
 
 > This project utilizes `docker context` to access containers of different machines, especially for Minecraft server control. 
 
@@ -42,9 +42,11 @@ Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` 
 
 Setting up docker access on a different host will depend on your needs. By default, the docker daemon will be accessed via TCP on port `2376`.
 
-#### Access Without TLS encryption 
+### Access Without TLS encryption 
 
-Copy `openssl/expose-docker-socket.conf` to the docker hosting machine. Go into `config.yml` and set the related `tlsProtection` fields to `false`. Set the related `serverHostName` field to the hostname of the docker hosting machine.
+Copy `openssl/expose-docker-socket.conf` to the docker hosting machine. 
+
+Go into `config.yml` and set the related `tlsProtection` fields to `false`. Set the related `serverHostName` field to the hostname of the docker hosting machine.
 
 ```bash
 # On the docker hosting machine
@@ -55,7 +57,7 @@ sudo systemctl daemon-reload; sudo systemctl restart docker
 sudo ufw allow 2376
 ```
 
-#### Access With TLS encryption
+### Access With TLS encryption
 
 Run the `openssl/gen-certs.sh` script to generate the certificates necessary for TLS. Copy these files to both the API server machine and docker hosting machine.
 
@@ -81,7 +83,9 @@ cp ./openssl/docker-<hostname>-cert.pem /usr/local/ssl
 cp ./openssl/docker-<hostname>-cert.key /usr/local/ssl
 ```
 
-Copy `openssl/expose-docker-socket-tls.conf` to the docker hosting machine. Go into `config.yml` and set the related `tlsProtection` fields to `true`. Set the related `serverHostName` field to the hostname of the docker hosting machine.
+Copy `openssl/expose-docker-socket-tls.conf` to the docker hosting machine. 
+
+Go into `config.yml` and set the related `tlsProtection` fields to `true`. Set the related `serverHostName` field to the hostname of the docker hosting machine.
 
 ```bash
 # On the docker hosting machine
@@ -92,7 +96,7 @@ sudo systemctl daemon-reload; sudo systemctl restart docker
 sudo ufw allow 2376
 ```
 
-## Deployment
+# Deployment
 
 Clone the repo:
 
@@ -149,7 +153,7 @@ sudo docker build -t kevinfham:custom .
 sudo docker compose up -d
 ```
 
-## APIs
+# APIs
 See `http://localhost:<SERVER_PORT>/api-docs` for further documentation
 
 `/api/machine` - LAN Device control
@@ -159,6 +163,6 @@ See `http://localhost:<SERVER_PORT>/api-docs` for further documentation
 `/api/vps` - Virtual Private Server remote control
 
 
-## Resources
+# Resources
 
 [OpenSSL Configuration Examples](https://www.ibm.com/docs/en/hpvs/1.2.x?topic=reference-openssl-configuration-examples)
