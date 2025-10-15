@@ -55,9 +55,9 @@ else
     echo "Generating new certificates for: $@..."
     for hostname in "$@"
     do
-        openssl genrsa -out $WDIR/docker-host-cert.key 4096
-        openssl req -new -sha256 -key $WDIR/docker-host-cert.key -config $WDIR/conf/docker-host.conf -out $WDIR/docker-host-cert.csr
-        openssl x509 -req -sha256 -days 3560 -in $WDIR/docker-host-cert.csr -CA $WDIR/ca-cert.pem -CAkey $WDIR/ca.key -CAcreateserial -extfile <(printf "subjectAltName = DNS:$hostname,IP:127.0.0.1\nextendedKeyUsage = serverAuth") -out $WDIR/docker-host-cert.pem
+        openssl genrsa -out $WDIR/docker-$hostname-cert.key 4096
+        openssl req -new -sha256 -key $WDIR/docker-$hostname-cert.key -config $WDIR/conf/docker-host.conf -out $WDIR/docker-host-cert.csr
+        openssl x509 -req -sha256 -days 3560 -in $WDIR/docker-host-cert.csr -CA $WDIR/ca-cert.pem -CAkey $WDIR/ca.key -CAcreateserial -extfile <(printf "subjectAltName = DNS:$hostname,IP:127.0.0.1\nextendedKeyUsage = serverAuth") -out $WDIR/docker-$hostname-cert.pem
         rm $WDIR/docker-host-cert.csr
     done
 fi

@@ -77,15 +77,15 @@ cp ./openssl/home-rest-api-cert.key /usr/local/ssl
 # Copy the Docker host machine certificate(s)
 mkdir -p /usr/local/ssl
 cp ./openssl/ca-cert.pem /usr/local/ssl
-cp ./openssl/docker-host-cert.pem /usr/local/ssl
-cp ./openssl/docker-host-cert.key /usr/local/ssl
+cp ./openssl/docker-<hostname>-cert.pem /usr/local/ssl
+cp ./openssl/docker-<hostname>-cert.key /usr/local/ssl
 ```
 
 Copy `openssl/expose-docker-socket-tls.conf` to the docker hosting machine. Go into `config.yml` and set the related `tlsProtection` fields to `true`. Set the related `serverHostName` field to the hostname of the docker hosting machine.
 
 ```bash
 # On the docker hosting machine
-sudo cp expose-docker-socket-tls.conf /etc/systemd/system/docker.service.d/expose-docker-socket-tls.conf     # Edit file paths if needed
+sudo cp expose-docker-socket-tls.conf /etc/systemd/system/docker.service.d/expose-docker-socket-tls.conf     # Edit file paths and change <hostname> to the machine's hostname
 sudo systemctl daemon-reload; sudo systemctl restart docker
 
 # Allow traffic if using ufw
