@@ -19,8 +19,9 @@ sudo apt install fping wakeonlan
 
 ```
 
-If you're using Digital Ocean for a VPS, follow the [doctl docs](https://docs.digitalocean.com/reference/doctl/) for info on installing `doctl`
+If using Digital Ocean for a VPS like in this project, follow the [doctl docs](https://docs.digitalocean.com/reference/doctl/) for info on installing `doctl`
 
+If using Docker for remote container management (like remote Minecraft server control), follow the [official docker script instructions](https://get.docker.com) for info on installing `docker`
 
 ## Deployment
 
@@ -50,7 +51,7 @@ sudo nginx -s reload
 
 Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` to `config.yml` and set all values.
 
-### Configuration
+### Configure `config.yml`
 
 `machines` - Register of all LAN devices acessible to the server
 
@@ -58,7 +59,11 @@ Rename `.example-env` to `.env` and set all values. Rename `example-config.yml` 
 
 `vps` - Assumes using Digital Ocean for VPS
 
-### Deploy
+### Configure remote `docker` control
+
+TODO:
+
+### PM2 Deployment
 
 Build and daemonize the server:
 
@@ -68,6 +73,10 @@ pnpm run deploy
 ```
 
 The server will run on the port `SERVER_PORT` specified by `.env`
+
+### Dockerfile Deployment
+
+TODO:
 
 ## APIs
 See `http://localhost:<SERVER_PORT>/api-docs` for further documentation

@@ -1,3 +1,4 @@
+import * as path from 'path';
 import type { ExecException } from 'child_process';
 import { exec } from 'child_process';
 import { readFileSync, existsSync } from 'fs';
@@ -48,20 +49,22 @@ const isMachineUp = async (serverAddress: string, timeoutms: number = 600): Prom
 }
 
 class DockerContext {
-    private contextUp = false;
-    private hostname;
-    private protocol;
-    private port;
+    private contextUp: boolean = false;
+    private tlsEnabled: boolean;
+    private hostname: string;
+    private hostSocket: string;
 
     public async isContextUp() { return this.contextUp; }
 
-    public constructor(hostname: string, port: number = 2376, protocol: string = 'tcp://') {
-        this.hostname = hostname;
-        this.protocol = protocol;
-        this.port = port;
+    public constructor(args: { hostname?: string, port?: number, protocol?: string, tlsEnabled?: boolean }) {
+        this.tlsEnabled = args.tlsEnabled ?? false;
+        this.hostname   = args.hostname ?? 'localhost';
+        const port      = args.port ?? 2376;
+        const protocol  = args.protocol ?? 'tcp://';
+        this.hostSocket = `${protocol}${this.hostname}:${port}`;
     }
 
-    private async initContext(hostname: string, port: number, protocol: string): Promise<boolean> {
+    private async initContext(hostname: string, hostSocket: string, tlsEnabled: boolean, tlsCertDir: string = '/usr/local/ssl'): Promise<boolean> {
         this.contextUp = await new Promise<boolean>(async function(resolve, _) {
             // Check host connection
             if (!await isMachineUp(hostname)) {
@@ -70,16 +73,36 @@ class DockerContext {
             }
 
             // Check docker socket
-            var { err } = await promiseExec(`docker -H ${protocol}${hostname}:${port} version`);
+            if (tlsEnabled) {
+                var { err } = await promiseExec(`docker -H ${hostSocket} --tlsverify \
+                                                    --tlscacert=${path.join(tlsCertDir, 'ca-cert.pem')} \
+                                                    --tlscert=${path.join(tlsCertDir, 'home-rest-api-cert.pem')} \
+                                                    --tlskey=${path.join(tlsCertDir, 'home-rest-api-cert.key')} \
+                                                    version`);
+            } else {
+                var { err } = await promiseExec(`docker -H ${hostSocket} version`);
+            }
             if (err) {
-                console.error(`Failed to connect to docker socket at ${protocol}${hostname}:${port}: ${err}`);
+                console.error(`Failed to connect to docker socket at ${hostSocket}: ${err}`);
                 resolve(false); return;
             }
 
             // Attempt to create/update context
-            var { stderr, err } = await promiseExec(`docker context create --docker="host=${protocol}${hostname}:${port}" ${hostname}`);
+            if (tlsEnabled) {
+                var { stderr, err } = await promiseExec(`docker context create \
+                                      --docker="host=${hostSocket},ca=${path.join(tlsCertDir, 'ca-cert.pem')},cert=${path.join(tlsCertDir, 'home-rest-api-cert.pem')},key=${path.join(tlsCertDir, 'home-rest-api-cert.key')}" \
+                                      ${hostname}`);
+            } else {
+                var { stderr, err } = await promiseExec(`docker context create --docker="host=${hostSocket}" ${hostname}`);
+            }
             if (stderr.includes('already exists')) {
-                var { err } = await promiseExec(`docker context update --docker="host=${protocol}${hostname}:${port}" ${hostname}`);
+                if (tlsEnabled) {
+                    var { err } = await promiseExec(`docker context update \
+                                  --docker="host=${hostSocket},ca=${path.join(tlsCertDir, 'ca-cert.pem')},cert=${path.join(tlsCertDir, 'home-rest-api-cert.pem')},key=${path.join(tlsCertDir, 'home-rest-api-cert.key')}" \
+                                  ${hostname}`);
+                } else {
+                    var { err } = await promiseExec(`docker context update --docker="host=${hostSocket}" ${hostname}`);
+                }
                 if (err) {
                     console.error(`Failed to update context for ${hostname}: ${err}`)
                     resolve(false); return;
@@ -99,7 +122,8 @@ class DockerContext {
     }
 
     public async run(cmd: string): Promise<{stdout: string, stderr: string, err: ExecException | null}> {
-        if (this.contextUp || (!this.contextUp && await this.initContext(this.hostname, this.port, this.protocol))) {
+        const cfg = parseConfig();
+        if (this.contextUp || (!this.contextUp && await this.initContext(this.hostname, this.hostSocket, this.tlsEnabled, cfg.mcServer.tlsCertDir))) {
             await promiseExec(`docker context use ${this.hostname}`);
             return promiseExec(cmd);
         } 

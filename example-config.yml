@@ -11,6 +11,8 @@ machines:
 # Minecraft Server Config
 mcServer:
   serverHostName: 'localhost'
+  tlsProtection: false
+  tlsCertDir: '/usr/local/ssl'
   # ORDER MATTERS FOR THESE VALUES
   mcServerAddr: 
   - 'play1.addr.mc'
