@@ -27,7 +27,9 @@ beforeAll(async () => {
     vi.mock('../../src/api/mc-server/utils.js', async (importOriginal) => { 
         const actual = await importOriginal();
         return { 
-            McDockerContext: actual.McDockerContext,
+            McDockerContext: {
+                run: (_: string) => { return { stdout: 'success', stderr: '', err: null }; }
+            },
             ServerStatus: actual.ServerStatus,
             ServerAliasDict: { 
                 "survival-world-active": 'survival_world_active',

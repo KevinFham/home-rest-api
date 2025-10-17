@@ -24,11 +24,11 @@ export class DockerContext {
     }
 
     private async initContext(hostname: string, hostSocket: string, tlsEnabled: boolean, tlsCertDir: string): Promise<boolean> {
-        this.contextUp = await new Promise<boolean>(async function(resolve, _) {
+        this.contextUp = await new Promise<boolean>(async function(resolve, reject) {
             // Check host connection
             if (!await isMachineUp(hostname)) {
-                console.error(`Failed to connect to ${hostname} for docker context.`);
-                resolve(false); return;
+                reject(new Error(`Failed to connect to ${hostname} for docker context.`));
+                return;
             }
 
             // Check docker socket
@@ -42,8 +42,8 @@ export class DockerContext {
                 var { err } = await promiseExec(`docker -H ${hostSocket} version`);
             }
             if (err) {
-                console.error(`Failed to connect to docker socket at ${hostSocket}: ${err}`);
-                resolve(false); return;
+                reject(new Error(`Failed to connect to docker socket at ${hostSocket}: ${err}`));
+                return;
             }
 
             // Attempt to create/update context
@@ -63,14 +63,14 @@ export class DockerContext {
                     var { err } = await promiseExec(`docker context update --docker="host=${hostSocket}" ${hostname}`);
                 }
                 if (err) {
-                    console.error(`Failed to update docker context for ${hostname}: ${err}`)
+                    reject(new Error(`Failed to update docker context for ${hostname}: ${err}`));
                     resolve(false); return;
                 }
                 console.log(`Successfully started docker context for ${hostname}!`);
                 resolve(true); return;
             }  else if (err) {
-                console.error(`Failed to create docker context for ${hostname}: ${err}`)
-                resolve(false); return;
+                reject(new Error(`Failed to create docker context for ${hostname}: ${err}`));
+                return;
             }
 
             console.log(`Successfully started docker context for ${hostname}!`);

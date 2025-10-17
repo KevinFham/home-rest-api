@@ -8,21 +8,22 @@ import { promiseExec } from '@/src/utils.js';
  */
 
 export class DoctlContext {
-    private contextUp: boolean = false;
+    private contextUp: boolean;
     private apiToken: string;
 
-    public async isContextUp() { return this.contextUp; }
+    public isContextUp(): boolean { return this.contextUp; }
 
     public constructor(apiToken: string) {
         this.apiToken = apiToken;
+        this.contextUp = false;
     }
 
     private async initContext(apiToken: string): Promise<boolean> {
-        this.contextUp = await new Promise<boolean>(async function(resolve, _) {
+        this.contextUp = await new Promise<boolean>(async function(resolve, reject) {
             var { err } = await promiseExec(`doctl auth init -t ${apiToken}`);
             if (err) {
-                console.error(`Invalid Digital Ocean API Token: ${err}`)
-                resolve(false); return;
+                reject(new Error(`Invalid Digital Ocean API Token: ${err}`));
+                return;
             }
 
             console.log(`Successfully started doctl context!`);
