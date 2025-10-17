@@ -3,7 +3,7 @@ import { parseConfig } from '@/src/utils.js';
 
 const cfg = parseConfig();
 
-export const McDockerContext = new DockerContext({ hostname: cfg.mcServer.serverHostName, tlsEnabled: true, tlsCertDir: cfg.mcServer.tlsCertDir });
+export const McDockerContext = new DockerContext({ hostname: cfg.mcServer.serverHostName, tlsEnabled: cfg.mcServer.tlsEnabled, tlsCertDir: cfg.mcServer.tlsCertDir });
 
 export enum ServerStatus {
     STOPPED = "STOPPED",
