@@ -13,13 +13,13 @@ COPY \@types/ ./\@types
 COPY package*.json ./
 COPY tsconfig.json ./
 
-RUN echo "Installing Node dependencies..." \
-    && npm install -g pnpm \
-    && npm add -g ts-patch typescript \
-    && pnpm install
-
-RUN echo "Building application..." \
-    && ts-patch install -s \
-    && tspc -p ./tsconfig.json
-
-CMD ["node", "/app/build/main.js"]
+#RUN echo "Installing Node dependencies..." \
+#    && npm install -g pnpm \
+#    && npm add -g ts-patch typescript \
+#    && pnpm install
+#
+#RUN echo "Building application..." \
+#    && ts-patch install -s \
+#    && tspc -p ./tsconfig.json
+#
+#CMD ["node", "/app/build/main.js"]
