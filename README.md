@@ -70,11 +70,11 @@ cd home-rest-api
 # Generate certificates for multiple docker hosts
 ./openssl/gen-certs.sh -v <host-name-1> <host-name-2> <host-name-3>
 
-# Copy the API server certificate (default location)
-mkdir -p /usr/local/ssl
-cp ./openssl/ca-cert.pem /usr/local/ssl
-cp ./openssl/home-rest-api-cert.pem /usr/local/ssl
-cp ./openssl/home-rest-api-cert.key /usr/local/ssl
+# (OPTIONAL) Copy the API server certificate to another location (you'll have to modify config.yml accordingly)
+#mkdir -p /usr/local/ssl
+#cp ./openssl/ca-cert.pem /usr/local/ssl
+#cp ./openssl/home-rest-api-cert.pem /usr/local/ssl
+#cp ./openssl/home-rest-api-cert.key /usr/local/ssl
 
 # Copy the Docker host machine certificate(s)
 mkdir -p /usr/local/ssl

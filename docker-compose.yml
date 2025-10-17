@@ -9,8 +9,9 @@ services:
     volumes:
       - './.env:/app/.env:ro'
       - './config.yml:/app/config.yml:ro'
-      - '/home/kevin/.ssh/id_ed25519:/root/.ssh/id_ed25519:ro'
-      - '/home/kevin/.ssh/known_hosts:/root/.ssh/known_hosts:ro'
+      - './openssl/ca-cert.pem:/app/openssl/ca-cert.pem:ro'
+      - './openssl/home-rest-api-cert.pem:/app/openssl/home-rest-api-cert.pem:ro'
+      - './openssl/home-rest-api-cert.key:/app/openssl/home-rest-api-cert.key:ro'
     restart: always
 #  nginx:
 #    image: ghcr.io/nginxinc/nginx-unprivileged:stable-alpine

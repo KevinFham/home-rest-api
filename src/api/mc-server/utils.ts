@@ -1,8 +1,9 @@
-import { DockerContext, parseConfig } from '@/src/utils.js';
+import { DockerContext } from '@/src/contexts/docker-context.js';
+import { parseConfig } from '@/src/utils.js';
 
 const cfg = parseConfig();
 
-export const McDockerContext = new DockerContext({ hostname: cfg.mcServer.serverHostName, tlsEnabled: true });
+export const McDockerContext = new DockerContext({ hostname: cfg.mcServer.serverHostName, tlsEnabled: true, tlsCertDir: cfg.mcServer.tlsCertDir });
 
 export enum ServerStatus {
     STOPPED = "STOPPED",

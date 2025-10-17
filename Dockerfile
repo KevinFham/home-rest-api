@@ -7,22 +7,19 @@ RUN echo "Installing binary dependencies..." \
     && echo "awake \"\$@\"" > /usr/sbin/wakeonlan \
     && chmod +x /usr/sbin/wakeonlan
 
-RUN echo "Configuring network settings..." \
-    && printf "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null\n  GlobalKnownHostsFile /dev/null" >> /etc/ssh/ssh_config
+COPY src/ ./src
+RUN mkdir ./build && find ./src/ -name '*.yml' -exec cp --parents -t ./build {} \; && mv ./build/src/* ./build && rmdir ./build/src
+COPY \@types/ ./\@types
+COPY package*.json ./
+COPY tsconfig.json ./
 
-#COPY src/ ./src
-#RUN mkdir ./build && find ./src/ -name '*.yml' -exec cp --parents -t ./build {} \; && mv ./build/src/* ./build && rmdir ./build/src
-#COPY \@types/ ./\@types
-#COPY package*.json ./
-#COPY tsconfig.json ./
-#
-#RUN echo "Installing Node dependencies..." \
-#    && npm install -g pnpm \
-#    && npm add -g ts-patch typescript \
-#    && pnpm install
-#
-#RUN echo "Building application..." \
-#    && ts-patch install -s \
-#    && tspc -p ./tsconfig.json
-#
-#CMD ["node", "/app/build/main.js"]
+RUN echo "Installing Node dependencies..." \
+    && npm install -g pnpm \
+    && npm add -g ts-patch typescript \
+    && pnpm install
+
+RUN echo "Building application..." \
+    && ts-patch install -s \
+    && tspc -p ./tsconfig.json
+
+CMD ["node", "/app/build/main.js"]

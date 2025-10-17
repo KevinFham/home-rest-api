@@ -7,20 +7,13 @@ import { glob } from 'glob';
 import type { Application, Request, Response } from 'express';
 import express from 'express';
 import openapi from '@wesleytodd/openapi'
-import { parseConfig } from '@/src/utils.js';
 
+globalThis.appDir = __dirname;
+globalThis.projectDir = path.join(__dirname, '/..');
 const FILE_EXTENSION = (process.env['NODE_ENV'] == 'development') ? '.ts' : '.js';
-const cfg = parseConfig();
 
 // Ensure Required Binaries are installed
-const requiredBin = [
-    'fping',
-    'wakeonlan',
-    'docker',
-    'doctl',
-]
-if ('dropletID' in cfg.vps) { requiredBin.push('doctl'); }
-
+const requiredBin = [ 'fping', 'wakeonlan', 'docker', 'doctl' ];
 if (process.env['PATH']) {
     const pathDirs = process.env['PATH'].split(':');
     var binFound = false;

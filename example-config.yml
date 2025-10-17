@@ -12,7 +12,7 @@ machines:
 mcServer:
   serverHostName: 'localhost'
   tlsProtection: false
-  tlsCertDir: '/usr/local/ssl'
+  tlsCertDir: './openssl/'
   # ORDER MATTERS FOR THESE VALUES
   mcServerAddr: 
   - 'play1.addr.mc'
@@ -27,7 +27,6 @@ mcServer:
 
 # VPS Config
 vps:
-    vpsHostname: 'hostnameOrIpAddress.local'
     dropletID: 123456789
     # In Seconds
     startDelay: 10
