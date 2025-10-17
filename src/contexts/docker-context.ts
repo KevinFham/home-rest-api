@@ -54,7 +54,7 @@ export class DockerContext {
             } else {
                 var { stderr, err } = await promiseExec(`docker context create --docker="host=${hostSocket}" ${hostname}`);
             }
-            if (stderr.includes('already exists')) {
+            if (stderr && stderr.includes('already exists')) {
                 if (tlsEnabled) {
                     var { err } = await promiseExec(`docker context update \
                                   --docker="host=${hostSocket},ca=${path.join(tlsCertDir, 'ca-cert.pem')},cert=${path.join(tlsCertDir, 'home-rest-api-cert.pem')},key=${path.join(tlsCertDir, 'home-rest-api-cert.key')}" \
@@ -64,7 +64,7 @@ export class DockerContext {
                 }
                 if (err) {
                     reject(new Error(`Failed to update docker context for ${hostname}: ${err}`));
-                    resolve(false); return;
+                    return;
                 }
                 console.log(`Successfully started docker context for ${hostname}!`);
                 resolve(true); return;

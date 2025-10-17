@@ -25,7 +25,7 @@ beforeAll(() => {
 
 test('doctl logic check', async () => {
     var doctlContext = new DoctlContext('badAPItoken');
-    await expect(doctlContext.run('test command')).rejects.toThrowError();
+    await expect(doctlContext.run('test command')).rejects.toThrowError(new Error('Invalid Digital Ocean API Token: Error: Invalid Token'));
 
     doctlContext = new DoctlContext('goodAPItoken');
     await expect(doctlContext.run('test command')).toBeTruthy();
