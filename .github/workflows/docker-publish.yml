@@ -141,3 +141,9 @@ jobs:
         id: inspect
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+
+      - name: Delete Untagged Containers
+        uses: .github/workflow/delete-untagged-containers.yml
+        with:
+          package_name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          package_type: 'container'
