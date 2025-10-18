@@ -1,7 +1,7 @@
 services:
   # Main REST API server
   api-server:
-    image: kevinfham:test
+    image: ghcr.io/kevinfham/home-rest-api:latest
     container_name: api-server
     network_mode: host
 #    ports:

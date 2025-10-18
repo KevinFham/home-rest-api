@@ -140,16 +140,14 @@ pnpm run deploy
 
 Either pull the latest build from the GitHub Container Repository:
 
-TODO:
-
 ```bash
-sudo docker pull ghcr.io/hopefullyidontforgetthis
+sudo docker pull ghcr.io/kevinfham/home-rest-api:latest
 sudo docker compose up -d
 ```
 
-...or build the container yourself:
+...or build the container yourself (you'll have to modify `docker-compose.yml`):
 ```bash
-sudo docker build -t kevinfham:custom .
+sudo docker build -t kevinfham:latest .
 sudo docker compose up -d
 ```
 
