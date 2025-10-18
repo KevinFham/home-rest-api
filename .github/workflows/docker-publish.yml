@@ -116,12 +116,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GIT_TOKEN }}
 
-      # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20
-        with:
-          cosign-release: 'v2.2.4'
-
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -147,13 +141,3 @@ jobs:
         id: inspect
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
-
-      # https://github.com/sigstore/cosign
-      - name: Sign published Docker image
-        env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          DIGEST: ${{ steps.inspect.outputs.digest }}
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@sha256:${DIGEST}
-
-
