@@ -1,0 +1,11 @@
+name: Cleanup Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-untagged-containers:
+    uses: ./github/workflows/delete-untagged-containers.yml
+    with:
+      package_name: 'ghcr.io/kevinfham/home-rest-api'
+      package_type: 'container'
